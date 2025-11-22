@@ -57,3 +57,7 @@ logs/
 *.db
 *.sqlite
 
+# Docker volumes
+.pgdata/
+docker-volumes/
+

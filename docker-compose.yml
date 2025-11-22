@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+  postgres:
+    restart: unless-stopped
+    container_name: projector-postgres
+    image: postgres:16-alpine
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: projector
+      POSTGRES_USER: projector
+      POSTGRES_PASSWORD: projector
+      PGDATA: /var/lib/postgresql/data/pgdata
+    networks:
+      - projector-net
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U projector"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    restart: unless-stopped
+    container_name: projector-redis
+    image: redis:7-alpine
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes
+    networks:
+      - projector-net
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  projector-net:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local
+  redis-data:
+    driver: local
+

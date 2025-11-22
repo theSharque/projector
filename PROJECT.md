@@ -94,6 +94,8 @@ projector/
 │   │   │   │   │   ├── service/    # Бизнес-логика
 │   │   │   │   │   ├── model/      # Модели данных
 │   │   │   │   │   └── exception/  # Исключения
+│   │   │   │   ├── role/           # Модуль ролей
+│   │   │   │   ├── user/           # Модуль пользователей
 │   │   │   │   └── ProjectorApplication.java
 │   │   │   └── resources/
 │   │   │       └── application.yml
@@ -101,6 +103,7 @@ projector/
 │   ├── build.gradle
 │   ├── settings.gradle
 │   └── README.md
+├── docker-compose.yml    # Docker Compose для БД (PostgreSQL, Redis)
 └── PROJECT.md
 ```
 
@@ -110,4 +113,49 @@ JWT токены реализованы аналогично проекту `/qs
 - Генерация на основе RSA ключей (RS256)
 - Хранение в cookie клиента с именем `X-Auth`
 - Модульная структура для независимости от основного функционала
+
+## Docker Compose
+
+Для разработки и тестирования доступен `docker-compose.yml` в корне проекта, который поднимает необходимые сервисы:
+
+### Сервисы
+
+1. **PostgreSQL 16** (`projector-postgres`)
+   - Порт: `5432`
+   - База данных: `projector`
+   - Пользователь: `projector`
+   - Пароль: `projector`
+   - Данные сохраняются в Docker volume `postgres-data`
+
+2. **Redis 7** (`projector-redis`)
+   - Порт: `6379`
+   - Данные сохраняются в Docker volume `redis-data`
+   - AOF (Append Only File) включен для персистентности
+
+### Запуск
+
+```bash
+# Запустить все сервисы
+docker-compose up -d
+
+# Остановить все сервисы
+docker-compose down
+
+# Остановить и удалить volumes (очистить данные)
+docker-compose down -v
+
+# Просмотр логов
+docker-compose logs -f
+
+# Проверка статуса
+docker-compose ps
+```
+
+### Переменные окружения
+
+Параметры подключения соответствуют настройкам в `application.yml`:
+- `DB_USERNAME=projector` (по умолчанию)
+- `DB_PASSWORD=projector` (по умолчанию)
+- `REDIS_HOST=localhost` (по умолчанию)
+- `REDIS_PORT=6379` (по умолчанию)
 
