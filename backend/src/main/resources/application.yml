@@ -1,0 +1,72 @@
+spring:
+  application:
+    name: projector
+
+  # R2DBC PostgreSQL Configuration
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/projector
+    username: ${DB_USERNAME:projector}
+    password: ${DB_PASSWORD:projector}
+    pool:
+      initial-size: 5
+      max-size: 10
+      max-idle-time: 30m
+
+  # Redis Configuration
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+server:
+  port: ${SERVER_PORT:8080}
+  error:
+    include-message: always
+    include-binding-errors: always
+    include-stacktrace: on_param
+    include-exception: false
+
+# JWT Configuration
+jwt:
+  token:
+    max-age: ${TOKEN_MAX_AGE:3600}
+    cookie-name: ${TOKEN_COOKIE_NAME:X-Auth}
+
+logging:
+  level:
+    root: INFO
+    com.projector: DEBUG
+    org.springframework.web: INFO
+    org.springframework.security: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# SpringDoc OpenAPI Configuration
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+    try-it-out-enabled: true
+    filter: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+
