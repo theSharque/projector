@@ -1,0 +1,105 @@
+plugins {
+    id 'org.springframework.boot' version '3.2.0'
+    id 'io.spring.dependency-management' version '1.1.4'
+    id 'java'
+}
+
+group = 'com.projector'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("17")
+    targetCompatibility = JavaVersion.toVersion("17")
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs += [
+        '-Xlint:all',           // Все предупреждения
+        '-Xlint:-serial',       // Кроме serialVersionUID
+        '-Xlint:-processing'    // Кроме annotation processing
+    ]
+    options.deprecation = true  // Показывать deprecated API
+    options.encoding = 'UTF-8'  // Кодировка
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+    annotationProcessor {
+        resolutionStrategy.activateDependencyLocking()
+    }
+    compileClasspath {
+        resolutionStrategy.activateDependencyLocking()
+    }
+    implementation {
+        resolutionStrategy.activateDependencyLocking()
+    }
+    productionRuntimeClasspath {
+        resolutionStrategy.activateDependencyLocking()
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    jjwtVersion = '0.12.3'
+}
+
+dependencies {
+    // Spring Boot Starters
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-r2dbc'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+    // R2DBC PostgreSQL
+    implementation 'org.postgresql:r2dbc-postgresql:1.0.5.RELEASE'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // Redis (reactive)
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
+    runtimeOnly 'org.apache.commons:commons-pool2'
+
+    // JWT
+    implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+    runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Jackson
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+    // OpenAPI Documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.3.0'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+springBoot {
+    buildInfo()
+}
+
+dependencyLocking {
+    lockAllConfigurations()
+}
+
+tasks {
+    bootJar {
+        archiveFileName.set("projector.jar")
+    }
+}
+
