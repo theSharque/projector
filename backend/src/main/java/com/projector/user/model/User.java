@@ -40,10 +40,10 @@ public class User {
      * Создает упрощенную версию User для хранения в cookie (JWT)
      */
     public static User forCookie(User user) {
-        User cookieUser = new User();
-        cookieUser.setId(user.getId());
-        cookieUser.setEmail(user.getEmail());
-        return cookieUser;
+        return User.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .build();
     }
 }
 

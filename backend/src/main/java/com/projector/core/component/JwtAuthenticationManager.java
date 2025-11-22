@@ -33,7 +33,7 @@ public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
                 .map(auth -> jwtSigner.validateJwt((String) auth.getCredentials()))
                 .onErrorResume(err -> Mono.error(new UsernameNotFoundException("Неверный токен")))
                 .flatMap(jws -> {
-                    String subject = jws.getBody().getSubject();
+                    String subject = jws.getPayload().getSubject();
 
                     try {
                         UserClaims userClaims = objectMapper.readerFor(UserClaims.class).readValue(subject);
