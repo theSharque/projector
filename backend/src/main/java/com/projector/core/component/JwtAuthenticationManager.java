@@ -53,7 +53,6 @@ public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
                         .collect(Collectors.toList())
                 : List.of();
 
-        // TODO: Добавить проверку пользователя в БД
         User user = userClaims.getUser();
 
         return Mono.just((Authentication) new UsernamePasswordAuthenticationToken(

@@ -34,7 +34,6 @@ public class SecurityConfig {
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .pathMatchers("/actuator/health", "/actuator/info").permitAll()
                         .pathMatchers("/api/auth/**").permitAll()
-                        // Swagger/OpenAPI paths
                         .pathMatchers("/swagger-ui.html", "/swagger-ui/**").permitAll()
                         .pathMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll()
                         .pathMatchers("/swagger-resources/**", "/webjars/**").permitAll()

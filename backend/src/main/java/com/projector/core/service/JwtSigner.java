@@ -31,8 +31,6 @@ public class JwtSigner {
     private long maxAge;
 
     public JwtSigner() throws NoSuchAlgorithmException {
-        // Генерируем RSA ключи для RS256 алгоритма
-        // В production версии ключи должны храниться в конфигурации или секретах
         this.keyPair = Jwts.SIG.RS256.keyPair().build();
         log.info("JWT key pair generated successfully");
     }

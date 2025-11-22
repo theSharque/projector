@@ -47,7 +47,6 @@ public class UserService {
                         return Mono.error(new ServerWebInputException("User with such email already exists"));
                     }
                     user.setId(null);
-                    // TODO: Хеширование пароля должно быть реализовано
                     return userRepository.save(user);
                 });
     }
@@ -57,7 +56,6 @@ public class UserService {
                 .flatMap(valid -> userRepository.findById(id))
                 .switchIfEmpty(Mono.error(new ServerWebInputException("User not found")))
                 .flatMap(existingUser -> {
-                    // Проверяем, не используется ли email другим пользователем
                     return userRepository.findByEmail(user.getEmail())
                             .flatMap(emailUser -> {
                                 if (!emailUser.getId().equals(id)) {
@@ -69,7 +67,6 @@ public class UserService {
                 })
                 .flatMap(unused -> {
                     user.setId(id);
-                    // Сохраняем существующий passHash, если новый не указан
                     return userRepository.findById(id)
                             .flatMap(existingUser -> {
                                 if (user.getPassHash() == null) {
@@ -88,9 +85,6 @@ public class UserService {
                         .then());
     }
 
-    /**
-     * Get user by email and password for authentication
-     */
     public Mono<User> getUser(String email, String password) {
         String login = email.toLowerCase();
         return userRepository.findByEmail(login)
@@ -105,9 +99,6 @@ public class UserService {
                 .switchIfEmpty(Mono.error(new UsernameNotFoundException("Invalid username or password")));
     }
 
-    /**
-     * Hash password using SHA256
-     */
     private String sha256Hash(String password) {
         try {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
