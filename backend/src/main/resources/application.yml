@@ -4,7 +4,7 @@ spring:
 
   # R2DBC PostgreSQL Configuration
   r2dbc:
-    url: r2dbc:postgresql://localhost:5432/projector
+    url: r2dbc:postgresql://localhost:${DB_PORT:5433}/projector
     username: ${DB_USERNAME:projector}
     password: ${DB_PASSWORD:projector}
     pool:
@@ -12,11 +12,20 @@ spring:
       max-size: 10
       max-idle-time: 30m
 
+  # Flyway Configuration (for database migrations)
+  flyway:
+    enabled: false
+    locations: classpath:db/migration
+    url: jdbc:postgresql://localhost:${DB_PORT:5433}/projector
+    user: ${DB_USERNAME:projector}
+    password: ${DB_PASSWORD:projector}
+    baseline-on-migrate: true
+
   # Redis Configuration
   data:
     redis:
       host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+      port: ${REDIS_PORT:6380}
       password: ${REDIS_PASSWORD:}
       timeout: 2000ms
       lettuce:

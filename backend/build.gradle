@@ -60,6 +60,9 @@ dependencies {
     implementation 'org.postgresql:r2dbc-postgresql:1.0.5.RELEASE'
     runtimeOnly 'org.postgresql:postgresql'
 
+    // Flyway for database migrations
+    implementation 'org.flywaydb:flyway-core:10.9.1'
+
     // Redis (reactive)
     implementation 'org.springframework.boot:spring-boot-starter-data-redis-reactive'
     runtimeOnly 'org.apache.commons:commons-pool2'
