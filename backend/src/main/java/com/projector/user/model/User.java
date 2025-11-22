@@ -36,9 +36,6 @@ public class User {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String passHash;
 
-    /**
-     * Создает упрощенную версию User для хранения в cookie (JWT)
-     */
     public static User forCookie(User user) {
         return User.builder()
                 .id(user.getId())

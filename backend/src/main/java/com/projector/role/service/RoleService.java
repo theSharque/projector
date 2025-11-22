@@ -58,7 +58,6 @@ public class RoleService {
                     if (!exists) {
                         return Mono.error(new ServerWebInputException("Role not found"));
                     }
-                    // Проверяем, не используется ли имя другим ролью
                     return roleRepository.findByName(role.getName())
                             .flatMap(existingRole -> {
                                 if (!existingRole.getId().equals(id)) {
@@ -84,7 +83,6 @@ public class RoleService {
                     if (!exists) {
                         return Mono.error(new ServerWebInputException("Role not found"));
                     }
-                    // TODO: Проверка на использование роли пользователями
                     return roleRepository.deleteById(id)
                             .then();
                 });
@@ -135,19 +133,17 @@ public class RoleService {
     }
 
     private Role prepareRoleForSave(Role role) {
-        // Подготавливаем роль для сохранения: конвертируем authorities в строку
-        Role roleToSave = new Role();
-        roleToSave.setId(role.getId());
-        roleToSave.setName(role.getName());
+        Role roleToSave = Role.builder()
+                .id(role.getId())
+                .name(role.getName())
+                .build();
         roleToSave.setAuthorities(role.getAuthorities() != null ? new HashSet<>(role.getAuthorities()) : new HashSet<>());
-        // authoritiesString будет установлен автоматически через setAuthorities
         return roleToSave;
     }
 
     private Role loadAuthoritiesFromString(Role role) {
-        // Загружаем authorities из строки в Set для JSON сериализации
         if (role.getAuthoritiesString() != null) {
-            role.getAuthorities(); // Это вызовет метод getAuthorities() который загрузит из строки
+            role.getAuthorities();
         }
         return role;
     }

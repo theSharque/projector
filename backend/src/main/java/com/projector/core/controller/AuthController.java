@@ -67,8 +67,6 @@ public class AuthController {
     public Mono<ResponseEntity<Object>> login(@RequestBody UserCredentials userCredentials) {
         return userService.getUser(userCredentials.getEmail(), userCredentials.getPassword())
                 .map(user -> {
-                    // For now, return empty authorities list
-                    // TODO: Implement authorities based on roles
                     List<String> authorities = Collections.emptyList();
                     String jwt = jwtSigner.createUserJwt(user, authorities);
                     

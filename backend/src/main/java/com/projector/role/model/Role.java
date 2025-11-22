@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -41,18 +42,13 @@ public class Role {
     @JsonProperty("authorities")
     private Set<String> authorities;
 
-    /**
-     * Конструктор для R2DBC - создает Role из данных БД
-     */
+    @Builder
     public Role(Long id, String name, String authoritiesString) {
         this.id = id;
         this.name = name;
         this.authoritiesString = authoritiesString;
     }
 
-    /**
-     * Получить authorities из строки (хранится через запятую)
-     */
     public Set<String> getAuthorities() {
         if (authorities != null) {
             return authorities;
@@ -66,9 +62,6 @@ public class Role {
                 .collect(Collectors.toSet());
     }
 
-    /**
-     * Установить authorities и обновить строку для БД
-     */
     public void setAuthorities(Set<String> authorities) {
         this.authorities = authorities != null ? new HashSet<>(authorities) : Collections.emptySet();
         this.authoritiesString = this.authorities.isEmpty()
@@ -76,15 +69,13 @@ public class Role {
                 : String.join(",", this.authorities);
     }
 
-    /**
-     * Создать Role с authorities из строки
-     */
     public static Role fromAuthoritiesString(Long id, String name, String authoritiesString) {
-        Role role = new Role();
-        role.setId(id);
-        role.setName(name);
-        role.setAuthoritiesString(authoritiesString);
-        role.getAuthorities(); // Инициализировать authorities из строки
+        Role role = Role.builder()
+                .id(id)
+                .name(name)
+                .authoritiesString(authoritiesString)
+                .build();
+        role.getAuthorities();
         return role;
     }
 }
