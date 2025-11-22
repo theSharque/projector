@@ -7,7 +7,6 @@ import com.projector.user.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import java.security.KeyPair;
 import java.security.NoSuchAlgorithmException;
 import java.time.Duration;
@@ -34,12 +33,15 @@ public class JwtSigner {
     public JwtSigner() throws NoSuchAlgorithmException {
         // Генерируем RSA ключи для RS256 алгоритма
         // В production версии ключи должны храниться в конфигурации или секретах
-        this.keyPair = Keys.keyPairFor(io.jsonwebtoken.SignatureAlgorithm.RS256);
+        this.keyPair = Jwts.SIG.RS256.keyPair().build();
         log.info("JWT key pair generated successfully");
     }
 
     public String createUserJwt(User user, List<String> authorities) {
-        UserClaims userClaims = new UserClaims(User.forCookie(user), authorities);
+        UserClaims userClaims = UserClaims.builder()
+                .user(User.forCookie(user))
+                .authorities(authorities)
+                .build();
         String subject;
         try {
             subject = objectMapper
@@ -50,14 +52,15 @@ public class JwtSigner {
             throw new RuntimeException(e);
         }
 
-        Date expirationDate = Date.from(Instant.now().plus(Duration.ofSeconds(maxAge)));
+        Instant now = Instant.now();
+        Instant expiration = now.plus(Duration.ofSeconds(maxAge));
 
         return Jwts.builder()
-                .signWith(keyPair.getPrivate(), io.jsonwebtoken.SignatureAlgorithm.RS256)
-                .setSubject(subject)
-                .setIssuer("projector")
-                .setExpiration(expirationDate)
-                .setIssuedAt(Date.from(Instant.now()))
+                .subject(subject)
+                .issuer("projector")
+                .issuedAt(Date.from(now))
+                .expiration(Date.from(expiration))
+                .signWith(keyPair.getPrivate())
                 .compact();
     }
 
