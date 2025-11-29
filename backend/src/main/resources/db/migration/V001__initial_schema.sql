@@ -63,6 +63,20 @@ CREATE INDEX IF NOT EXISTS idx_features_quarter ON features(quarter);
 CREATE INDEX IF NOT EXISTS idx_features_year_quarter ON features(year, quarter);
 CREATE INDEX IF NOT EXISTS idx_features_author_id ON features(author_id);
 
+CREATE TABLE IF NOT EXISTS tasks (
+    id BIGSERIAL PRIMARY KEY,
+    feature_id BIGINT NOT NULL,
+    summary VARCHAR(255),
+    description TEXT,
+    create_date TIMESTAMP NOT NULL,
+    update_date TIMESTAMP,
+    author_id BIGINT NOT NULL,
+    FOREIGN KEY (feature_id) REFERENCES features(id),
+    FOREIGN KEY (author_id) REFERENCES users(id)
+);
+CREATE INDEX IF NOT EXISTS idx_tasks_feature_id ON tasks(feature_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_author_id ON tasks(author_id);
+
 INSERT INTO users (id, email, pass_hash)
 VALUES (
         1,
@@ -74,7 +88,7 @@ INSERT INTO roles (id, name, authorities)
 VALUES (
         1,
         'SUPERADMIN',
-        'USER_VIEW,USER_EDIT,ROLE_VIEW,ROLE_EDIT,ROADMAP_VIEW,ROADMAP_EDIT,FEATURE_VIEW,FEATURE_EDIT'
+        'USER_VIEW,USER_EDIT,ROLE_VIEW,ROLE_EDIT,ROADMAP_VIEW,ROADMAP_EDIT,FEATURE_VIEW,FEATURE_EDIT,TASK_VIEW,TASK_EDIT'
     ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)
@@ -84,4 +98,5 @@ SELECT setval('users_id_seq', 10, true);
 SELECT setval('roles_id_seq', 10, true);
 SELECT setval('roadmaps_id_seq', 10, true);
 SELECT setval('features_id_seq', 10, true);
+SELECT setval('tasks_id_seq', 10, true);
 
