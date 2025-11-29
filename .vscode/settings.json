@@ -1,0 +1,43 @@
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "[java]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "redhat.java",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false
+  },
+  "java.format.settings.url": "",
+  "java.format.settings.profile": "",
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "java.saveActions.organizeImports": true,
+  "java.format.enabled": true,
+  "java.cleanup.actionsOnSave": [
+    "addDeprecated",
+    "stringConcatToTextBlock",
+    "invertEquals",
+    "addOverride",
+    "lambdaExpression",
+    "instanceofPatternMatch",
+    "switchExpression",
+    "addFinalModifier",
+    "qualifyMembers",
+    "qualifyStaticMembers",
+    "qualifyStaticMembers",
+    "removeUnusedImports"
+  ],
+  "java.completion.importOrder": [
+    "java",
+    "javax",
+    "org",
+    "com"
+  ],
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true,
+  "files.trimFinalNewlines": false,
+  "files.eol": "\n"
+}
+
