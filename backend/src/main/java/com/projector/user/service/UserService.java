@@ -50,12 +50,16 @@ public class UserService {
     @Transactional
     public Mono<User> createUser(User user) {
         return validateUser(user)
+                .flatMap(valid -> validatePasswordForCreate(user))
                 .flatMap(valid -> userRepository.existsByEmail(user.getEmail()))
                 .flatMap(exists -> {
                     if (exists) {
                         return Mono.error(new ServerWebInputException(
                                 "User with such email already exists"));
                     }
+                    String passwordHash = sha256Hash(user.getPassword());
+                    user.setPassHash(passwordHash);
+                    user.setPassword(null);
                     user.setId(null);
                     return userRepository.save(user);
                 })
@@ -94,9 +98,13 @@ public class UserService {
                             .findById(id)
                             .flatMap(
                                     existingUser -> {
-                                        if (user.getPassHash() == null) {
+                                        if (user.getPassword() != null && !user.getPassword().isBlank()) {
+                                            String passwordHash = sha256Hash(user.getPassword());
+                                            user.setPassHash(passwordHash);
+                                        } else {
                                             user.setPassHash(existingUser.getPassHash());
                                         }
+                                        user.setPassword(null);
 
                                         return userRepository.save(user);
                                     })
@@ -163,6 +171,14 @@ public class UserService {
 
         if (!EMAIL_PATTERN.matcher(user.getEmail()).matches()) {
             return Mono.error(new ServerWebInputException("Invalid email format"));
+        }
+
+        return Mono.just(true);
+    }
+
+    private Mono<Boolean> validatePasswordForCreate(User user) {
+        if (user.getPassword() == null || user.getPassword().isBlank()) {
+            return Mono.error(new ServerWebInputException("Password is required"));
         }
 
         return Mono.just(true);

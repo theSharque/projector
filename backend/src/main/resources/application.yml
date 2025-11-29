@@ -14,7 +14,7 @@ spring:
 
   # Flyway Configuration (for database migrations)
   flyway:
-    enabled: false
+    enabled: true
     locations: classpath:db/migration
     url: jdbc:postgresql://localhost:${DB_PORT:5433}/projector
     user: ${DB_USERNAME:projector}
@@ -78,4 +78,3 @@ springdoc:
     filter: true
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
-
