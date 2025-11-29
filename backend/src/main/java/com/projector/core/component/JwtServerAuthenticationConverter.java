@@ -1,8 +1,16 @@
 package com.projector.core.component;
 
+import org.springframework.http.ResponseCookie;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ServerWebExchange;
+
 import com.projector.core.config.Constants;
 import com.projector.core.exception.InvalidTokenException;
 import com.projector.core.service.JwtSigner;
+
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
@@ -10,12 +18,6 @@ import io.jsonwebtoken.io.DecodingException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseCookie;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.server.authentication.ServerAuthenticationConverter;
-import org.springframework.stereotype.Component;
-import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -30,12 +32,11 @@ public class JwtServerAuthenticationConverter implements ServerAuthenticationCon
         if (exchange != null
                 && exchange.getRequest().getCookies().get(Constants.AUTH_COOKIE_NAME) != null
                 && !exchange.getRequest().getCookies().get(Constants.AUTH_COOKIE_NAME).isEmpty()) {
-            String token =
-                    exchange.getRequest()
-                            .getCookies()
-                            .get(Constants.AUTH_COOKIE_NAME)
-                            .get(0)
-                            .getValue();
+            String token = exchange.getRequest()
+                    .getCookies()
+                    .get(Constants.AUTH_COOKIE_NAME)
+                    .get(0)
+                    .getValue();
 
             try {
                 jwtSigner.validateJwt(token);
