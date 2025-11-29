@@ -3,6 +3,7 @@ package com.projector.user.service;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -11,7 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ServerWebInputException;
 
 import com.projector.user.model.User;
+import com.projector.user.model.UserRole;
 import com.projector.user.repository.UserRepository;
+import com.projector.user.repository.UserRoleRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +29,7 @@ public class UserService {
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     private final UserRepository userRepository;
+    private final UserRoleRepository userRoleRepository;
 
     public Flux<User> getAllUsers() {
         return userRepository.findAll();
@@ -43,6 +47,7 @@ public class UserService {
                 .switchIfEmpty(Mono.error(new ServerWebInputException("User not found")));
     }
 
+    @Transactional
     public Mono<User> createUser(User user) {
         return validateUser(user)
                 .flatMap(valid -> userRepository.existsByEmail(user.getEmail()))
@@ -53,9 +58,17 @@ public class UserService {
                     }
                     user.setId(null);
                     return userRepository.save(user);
+                })
+                .flatMap(savedUser -> {
+                    if (user.getRoleIds() != null && !user.getRoleIds().isEmpty()) {
+                        return assignRolesToUser(savedUser.getId(), user.getRoleIds())
+                                .thenReturn(savedUser);
+                    }
+                    return Mono.just(savedUser);
                 });
     }
 
+    @Transactional
     public Mono<User> updateUser(Long id, User user) {
         return validateUser(user)
                 .flatMap(valid -> userRepository.findById(id))
@@ -86,7 +99,15 @@ public class UserService {
                                         }
 
                                         return userRepository.save(user);
-                                    });
+                                    })
+                            .flatMap(updatedUser -> {
+                                if (user.getRoleIds() != null) {
+                                    return deleteUserRoles(id)
+                                            .then(assignRolesToUser(id, user.getRoleIds()))
+                                            .thenReturn(updatedUser);
+                                }
+                                return Mono.just(updatedUser);
+                            });
                 });
     }
 
@@ -145,5 +166,23 @@ public class UserService {
         }
 
         return Mono.just(true);
+    }
+
+    private Mono<Void> assignRolesToUser(Long userId, List<Long> roleIds) {
+        if (roleIds == null || roleIds.isEmpty()) {
+            return Mono.empty();
+        }
+
+        return Flux.fromIterable(roleIds)
+                .map(roleId -> UserRole.builder()
+                        .userId(userId)
+                        .roleId(roleId)
+                        .build())
+                .flatMap(userRoleRepository::save)
+                .then();
+    }
+
+    private Mono<Void> deleteUserRoles(Long userId) {
+        return userRoleRepository.deleteByUserId(userId).then();
     }
 }
