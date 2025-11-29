@@ -95,7 +95,7 @@ public class RoleService {
                     if (!exists) {
                         return Mono.error(new ServerWebInputException("Role not found"));
                     }
-                    return roleRepository.deleteById(id).then();
+                    return roleRepository.deleteCascadeById(id).then();
                 });
     }
 
