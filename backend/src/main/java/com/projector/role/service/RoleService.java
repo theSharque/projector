@@ -1,21 +1,18 @@
 package com.projector.role.service;
 
+import com.projector.role.model.Authority;
+import com.projector.role.model.Role;
+import com.projector.role.repository.RoleRepository;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ServerWebInputException;
-
-import com.projector.role.model.Authority;
-import com.projector.role.model.Role;
-import com.projector.role.repository.RoleRepository;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,7 +21,8 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class RoleService {
 
-    private static final Pattern VALIDATION_PATTERN = Pattern.compile("^(?:\\p{L}|[_-]|\\d|\\s(?!\\s))+$");
+    private static final Pattern VALIDATION_PATTERN =
+            Pattern.compile("^(?:\\p{L}|[_-]|\\d|\\s(?!\\s))+$");
 
     private final RoleRepository roleRepository;
 
@@ -137,14 +135,16 @@ public class RoleService {
         if (authorities == null || authorities.isEmpty()) {
             return;
         }
-        Set<String> validAuthorityNames = Set.of(
-                Authority.USER_VIEW.getName(),
-                Authority.USER_EDIT.getName(),
-                Authority.ROLE_VIEW.getName(),
-                Authority.ROLE_EDIT.getName());
-        Set<String> invalidAuthorities = authorities.stream()
-                .filter(auth -> !validAuthorityNames.contains(auth))
-                .collect(Collectors.toSet());
+        Set<String> validAuthorityNames =
+                Set.of(
+                        Authority.USER_VIEW.getName(),
+                        Authority.USER_EDIT.getName(),
+                        Authority.ROLE_VIEW.getName(),
+                        Authority.ROLE_EDIT.getName());
+        Set<String> invalidAuthorities =
+                authorities.stream()
+                        .filter(auth -> !validAuthorityNames.contains(auth))
+                        .collect(Collectors.toSet());
         if (!invalidAuthorities.isEmpty()) {
             throw new ServerWebInputException(
                     "Invalid authorities: " + String.join(", ", invalidAuthorities));

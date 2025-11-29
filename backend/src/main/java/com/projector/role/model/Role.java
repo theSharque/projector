@@ -1,25 +1,22 @@
 package com.projector.role.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
-
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Table("roles")
@@ -35,12 +32,17 @@ public class Role {
     @NotNull
     private String name;
 
-    @Schema(description = "Authorities stored as comma-separated string in database", example = "USER_VIEW,USER_EDIT,ROLE_VIEW")
+    @Schema(
+            description = "Authorities stored as comma-separated string in database",
+            example = "USER_VIEW,USER_EDIT,ROLE_VIEW")
     @Column("authorities")
     @JsonIgnore
     private String authoritiesString;
 
-    @Schema(description = "Set of authorities", example = "[\"USER_VIEW\", \"USER_EDIT\", \"ROLE_VIEW\"]", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(
+            description = "Set of authorities",
+            example = "[\"USER_VIEW\", \"USER_EDIT\", \"ROLE_VIEW\"]",
+            accessMode = Schema.AccessMode.READ_ONLY)
     @Transient
     @JsonProperty("authorities")
     private Set<String> authorities;
@@ -66,8 +68,10 @@ public class Role {
     }
 
     public void setAuthorities(Set<String> authorities) {
-        this.authorities = authorities != null ? new HashSet<>(authorities) : Collections.emptySet();
-        this.authoritiesString = this.authorities.isEmpty() ? null : String.join(",", this.authorities);
+        this.authorities =
+                authorities != null ? new HashSet<>(authorities) : Collections.emptySet();
+        this.authoritiesString =
+                this.authorities.isEmpty() ? null : String.join(",", this.authorities);
     }
 
     public static Role fromAuthoritiesString(Long id, String name, String authoritiesString) {

@@ -1,10 +1,8 @@
 package com.projector.role.repository;
 
+import com.projector.role.model.Role;
 import org.springframework.data.r2dbc.repository.R2dbcRepository;
 import org.springframework.stereotype.Repository;
-
-import com.projector.role.model.Role;
-
 import reactor.core.publisher.Mono;
 
 @Repository

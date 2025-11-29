@@ -8,31 +8,26 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.projector.role.model.Authority;
+import com.projector.role.model.Role;
+import com.projector.role.repository.RoleRepository;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.web.server.ServerWebInputException;
-
-import com.projector.role.model.Authority;
-import com.projector.role.model.Role;
-import com.projector.role.repository.RoleRepository;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 public class RoleServiceTest {
 
-    @Mock
-    private RoleRepository roleRepository;
+    @Mock private RoleRepository roleRepository;
 
-    @InjectMocks
-    private RoleService roleService;
+    @InjectMocks private RoleService roleService;
 
     @BeforeEach
     public void setUp() {
@@ -89,10 +84,11 @@ public class RoleServiceTest {
         Role role = new Role();
         role.setName("NewRole");
         role.setAuthorities(Set.of(Authority.USER_VIEW.getName(), Authority.USER_EDIT.getName()));
-        Role savedRole = createRole(
-                1L,
-                "NewRole",
-                Set.of(Authority.USER_VIEW.getName(), Authority.USER_EDIT.getName()));
+        Role savedRole =
+                createRole(
+                        1L,
+                        "NewRole",
+                        Set.of(Authority.USER_VIEW.getName(), Authority.USER_EDIT.getName()));
 
         when(roleRepository.existsByName("NewRole")).thenReturn(Mono.just(false));
         when(roleRepository.save(any(Role.class))).thenReturn(Mono.just(savedRole));
@@ -135,8 +131,9 @@ public class RoleServiceTest {
 
         StepVerifier.create(roleService.createRole(role))
                 .expectErrorMatches(
-                        throwable -> throwable instanceof ServerWebInputException
-                                && throwable.getMessage().contains("at least 2 characters"))
+                        throwable ->
+                                throwable instanceof ServerWebInputException
+                                        && throwable.getMessage().contains("at least 2 characters"))
                 .verify();
 
         verify(roleRepository, never()).existsByName(anyString());
@@ -153,9 +150,10 @@ public class RoleServiceTest {
 
         StepVerifier.create(roleService.createRole(role))
                 .expectErrorMatches(
-                        throwable -> throwable instanceof ServerWebInputException
-                                && throwable.getMessage() != null
-                                && throwable.getMessage().contains("Invalid authorities"))
+                        throwable ->
+                                throwable instanceof ServerWebInputException
+                                        && throwable.getMessage() != null
+                                        && throwable.getMessage().contains("Invalid authorities"))
                 .verify();
 
         verify(roleRepository, times(1)).existsByName("NewRole");
@@ -243,7 +241,8 @@ public class RoleServiceTest {
     @Test
     public void testUpdateAuthorities_Success() {
         Role role = createRole(1L, "TestRole", Set.of(Authority.USER_VIEW.getName()));
-        Set<String> newAuthorities = Set.of(Authority.USER_EDIT.getName(), Authority.ROLE_VIEW.getName());
+        Set<String> newAuthorities =
+                Set.of(Authority.USER_EDIT.getName(), Authority.ROLE_VIEW.getName());
         Role updatedRole = createRole(1L, "TestRole", newAuthorities);
 
         when(roleRepository.findById(1L)).thenReturn(Mono.just(role));
