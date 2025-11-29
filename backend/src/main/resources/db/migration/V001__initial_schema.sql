@@ -18,6 +18,6 @@ INSERT INTO users (id, email, pass_hash)
 VALUES (1, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918')
 ON CONFLICT (id) DO NOTHING;
 
-SELECT setval('users_id_seq', COALESCE((SELECT MAX(id) FROM users), 1), true);
-SELECT setval('roles_id_seq', COALESCE((SELECT MAX(id) FROM roles), 1), true);
+SELECT setval('users_id_seq', 10, true);
+SELECT setval('roles_id_seq', 10, true);
 
