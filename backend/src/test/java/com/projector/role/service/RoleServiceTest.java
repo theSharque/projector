@@ -209,12 +209,12 @@ public class RoleServiceTest {
     @Test
     public void testDeleteRole_Success() {
         when(roleRepository.existsById(1L)).thenReturn(Mono.just(true));
-        when(roleRepository.deleteById(1L)).thenReturn(Mono.empty());
+        when(roleRepository.deleteCascadeById(1L)).thenReturn(Mono.just(1));
 
         StepVerifier.create(roleService.deleteRole(1L)).verifyComplete();
 
         verify(roleRepository, times(1)).existsById(1L);
-        verify(roleRepository, times(1)).deleteById(1L);
+        verify(roleRepository, times(1)).deleteCascadeById(1L);
     }
 
     @Test
@@ -235,7 +235,7 @@ public class RoleServiceTest {
                 .verify();
 
         verify(roleRepository, times(1)).existsById(1L);
-        verify(roleRepository, never()).deleteById(anyLong());
+        verify(roleRepository, never()).deleteCascadeById(anyLong());
     }
 
     @Test
