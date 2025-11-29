@@ -2,7 +2,6 @@ plugins {
     id 'org.springframework.boot' version '3.2.0'
     id 'io.spring.dependency-management' version '1.1.4'
     id 'java'
-    id 'com.diffplug.spotless' version '6.23.3'
 }
 
 group = 'com.projector'
@@ -93,10 +92,6 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-tasks.named('check') {
-    dependsOn 'spotlessCheck'
-}
-
 springBoot {
     buildInfo()
 }
@@ -108,25 +103,5 @@ dependencyLocking {
 tasks {
     bootJar {
         archiveFileName.set("projector.jar")
-    }
-}
-
-spotless {
-    java {
-        target 'src/**/*.java'
-
-        importOrder()
-        removeUnusedImports()
-
-        trimTrailingWhitespace()
-        endWithNewline()
-
-        googleJavaFormat('1.23.0').aosp()
-    }
-
-    format 'misc', {
-        target '*.gradle', '.gitignore'
-        trimTrailingWhitespace()
-        endWithNewline()
     }
 }
