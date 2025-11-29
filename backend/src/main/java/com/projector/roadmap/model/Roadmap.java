@@ -1,4 +1,4 @@
-package com.projector.project.model;
+package com.projector.roadmap.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,37 +19,42 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Table("projects")
+@Table("roadmaps")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Project {
+public class Roadmap {
 
-    @Schema(description = "Unique ID of project", example = "1")
+    @Schema(description = "Unique ID of roadmap", example = "1")
     @Id
     private Long id;
 
-    @Schema(description = "Project name", example = "My Project")
+    @Schema(description = "Roadmap project name", example = "My Roadmap")
     @NotBlank
     @NotNull
-    @Column("name")
-    private String name;
+    @Column("project_name")
+    private String projectName;
 
-    @Schema(description = "Project creation date", example = "2024-01-01T00:00:00")
+    @Schema(description = "Roadmap creation date", example = "2024-01-01T00:00:00", accessMode = Schema.AccessMode.READ_ONLY)
     @NotNull
     @Column("create_date")
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime createDate;
+
+    @Schema(description = "Roadmap last update date", example = "2024-01-02T00:00:00")
+    @Column("update_date")
+    private LocalDateTime updateDate;
 
     @Schema(description = "Author user ID", example = "1")
     @NotNull
     @Column("author_id")
     private Long authorId;
 
-    @Schema(description = "Project mission", example = "To build amazing software")
+    @Schema(description = "Roadmap mission", example = "To build amazing software")
     @Column("mission")
     private String mission;
 
-    @Schema(description = "Project description", example = "Detailed project description")
+    @Schema(description = "Roadmap description", example = "Detailed roadmap description")
     @Column("description")
     private String description;
 
@@ -58,3 +63,4 @@ public class Project {
     @JsonProperty("participantIds")
     private List<Long> participantIds;
 }
+

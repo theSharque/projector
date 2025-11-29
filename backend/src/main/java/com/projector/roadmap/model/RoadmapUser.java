@@ -1,4 +1,4 @@
-package com.projector.project.model;
+package com.projector.roadmap.model;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -10,15 +10,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Table("project_users")
+@Table("roadmap_users")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProjectUser {
+public class RoadmapUser {
 
     @Id
-    @Column("project_id")
-    private Long projectId;
+    @Column("roadmap_id")
+    private Long roadmapId;
 
     @Column("user_id")
     private Long userId;
