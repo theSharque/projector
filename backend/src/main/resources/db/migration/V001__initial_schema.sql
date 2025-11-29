@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
 
 INSERT INTO users (id, email, pass_hash)
-VALUES (1, 'admin@example.com', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918')
+VALUES (1, 'admin', '8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918')
 ON CONFLICT (id) DO NOTHING;
 
 SELECT setval('users_id_seq', COALESCE((SELECT MAX(id) FROM users), 1), true);
