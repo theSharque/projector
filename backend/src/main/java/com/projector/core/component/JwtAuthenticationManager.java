@@ -2,11 +2,9 @@ package com.projector.core.component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.projector.core.exception.InvalidTokenException;
 import com.projector.core.model.UserClaims;
 import com.projector.user.model.User;
 import com.projector.core.service.JwtSigner;
-import io.jsonwebtoken.Claims;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
