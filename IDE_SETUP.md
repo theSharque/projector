@@ -2,7 +2,7 @@
 
 ## VS Code
 
-Настройки уже добавлены в `.vscode/settings.json`. 
+Настройки уже добавлены в `.vscode/settings.json`.
 
 **Рекомендуемые расширения:**
 - `vscjava.vscode-java-pack` - Java Extension Pack
