@@ -1,6 +1,9 @@
 package com.projector.user.model;
 
+import java.util.List;
+
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
@@ -37,6 +40,11 @@ public class User {
     @Column("pass_hash")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String passHash;
+
+    @Schema(description = "List of role IDs assigned to the user", example = "[1, 2]")
+    @Transient
+    @JsonProperty("roleIds")
+    private List<Long> roleIds;
 
     public static User forCookie(User user) {
         return User.builder().id(user.getId()).email(user.getEmail()).build();
