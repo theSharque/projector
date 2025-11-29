@@ -1,11 +1,13 @@
 package com.projector.user.service;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import com.projector.user.model.User;
-import com.projector.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -13,15 +15,21 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.server.ServerWebInputException;
+
+import com.projector.user.model.User;
+import com.projector.user.repository.UserRepository;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 public class UserServiceTest {
 
-    @Mock private UserRepository userRepository;
+    @Mock
+    private UserRepository userRepository;
 
-    @InjectMocks private UserService userService;
+    @InjectMocks
+    private UserService userService;
 
     @BeforeEach
     public void setUp() {
@@ -96,9 +104,8 @@ public class UserServiceTest {
 
         StepVerifier.create(userService.getUserByEmail("test@test.com"))
                 .expectErrorMatches(
-                        throwable ->
-                                throwable instanceof ServerWebInputException
-                                        && throwable.getMessage().contains("User not found"))
+                        throwable -> throwable instanceof ServerWebInputException
+                                && throwable.getMessage().contains("User not found"))
                 .verify();
 
         verify(userRepository, times(1)).findByEmail("test@test.com");
@@ -106,8 +113,7 @@ public class UserServiceTest {
 
     @Test
     public void testGetUser_Authentication_Success() {
-        String passwordHash =
-                "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"; // SHA256("admin")
+        String passwordHash = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"; // SHA256("admin")
         User user = User.builder().id(1L).email("admin").passHash(passwordHash).build();
 
         when(userRepository.findByEmail("admin")).thenReturn(Mono.just(user));
@@ -121,19 +127,17 @@ public class UserServiceTest {
 
     @Test
     public void testGetUser_Authentication_WrongPassword() {
-        String passwordHash =
-                "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"; // SHA256("admin")
+        String passwordHash = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"; // SHA256("admin")
         User user = User.builder().id(1L).email("admin").passHash(passwordHash).build();
 
         when(userRepository.findByEmail("admin")).thenReturn(Mono.just(user));
 
         StepVerifier.create(userService.getUser("admin", "wrongpassword"))
                 .expectErrorMatches(
-                        throwable ->
-                                throwable instanceof UsernameNotFoundException
-                                        && throwable
-                                                .getMessage()
-                                                .equals("Invalid username or password"))
+                        throwable -> throwable instanceof UsernameNotFoundException
+                                && throwable
+                                        .getMessage()
+                                        .equals("Invalid username or password"))
                 .verify();
 
         verify(userRepository, times(1)).findByEmail("admin");
@@ -145,11 +149,10 @@ public class UserServiceTest {
 
         StepVerifier.create(userService.getUser("admin", "admin"))
                 .expectErrorMatches(
-                        throwable ->
-                                throwable instanceof UsernameNotFoundException
-                                        && throwable
-                                                .getMessage()
-                                                .equals("Invalid username or password"))
+                        throwable -> throwable instanceof UsernameNotFoundException
+                                && throwable
+                                        .getMessage()
+                                        .equals("Invalid username or password"))
                 .verify();
 
         verify(userRepository, times(1)).findByEmail("admin");
@@ -157,11 +160,15 @@ public class UserServiceTest {
 
     @Test
     public void testCreateUser_Success() {
-        User user = User.builder().email("test@test.com").passHash("hash").build();
+        User user = User.builder().email("test@test.com").password("password123").build();
         User savedUser = User.builder().id(1L).email("test@test.com").passHash("hash").build();
 
         when(userRepository.existsByEmail("test@test.com")).thenReturn(Mono.just(false));
-        when(userRepository.save(any(User.class))).thenReturn(Mono.just(savedUser));
+        when(userRepository.save(any(User.class))).thenAnswer(invocation -> {
+            User saved = invocation.getArgument(0);
+            saved.setId(1L);
+            return Mono.just(saved);
+        });
 
         StepVerifier.create(userService.createUser(user))
                 .expectNextMatches(
@@ -174,15 +181,14 @@ public class UserServiceTest {
 
     @Test
     public void testCreateUser_EmailAlreadyExists() {
-        User user = User.builder().email("test@test.com").passHash("hash").build();
+        User user = User.builder().email("test@test.com").password("password123").build();
 
         when(userRepository.existsByEmail("test@test.com")).thenReturn(Mono.just(true));
 
         StepVerifier.create(userService.createUser(user))
                 .expectErrorMatches(
-                        throwable ->
-                                throwable instanceof ServerWebInputException
-                                        && throwable.getMessage().contains("already exists"))
+                        throwable -> throwable instanceof ServerWebInputException
+                                && throwable.getMessage().contains("already exists"))
                 .verify();
 
         verify(userRepository, times(1)).existsByEmail("test@test.com");
@@ -195,9 +201,8 @@ public class UserServiceTest {
 
         StepVerifier.create(userService.createUser(user))
                 .expectErrorMatches(
-                        throwable ->
-                                throwable instanceof ServerWebInputException
-                                        && throwable.getMessage().contains("Invalid email format"))
+                        throwable -> throwable instanceof ServerWebInputException
+                                && throwable.getMessage().contains("Invalid email format"))
                 .verify();
 
         verify(userRepository, never()).existsByEmail(anyString());
@@ -206,8 +211,7 @@ public class UserServiceTest {
 
     @Test
     public void testUpdateUser_Success() {
-        User existingUser =
-                User.builder().id(1L).email("test@test.com").passHash("oldhash").build();
+        User existingUser = User.builder().id(1L).email("test@test.com").passHash("oldhash").build();
         User updateData = User.builder().id(1L).email("test@test.com").passHash("newhash").build();
         User updatedUser = User.builder().id(1L).email("test@test.com").passHash("newhash").build();
 
@@ -232,9 +236,8 @@ public class UserServiceTest {
 
         StepVerifier.create(userService.updateUser(1L, updateData))
                 .expectErrorMatches(
-                        throwable ->
-                                throwable instanceof ServerWebInputException
-                                        && throwable.getMessage().contains("User not found"))
+                        throwable -> throwable instanceof ServerWebInputException
+                                && throwable.getMessage().contains("User not found"))
                 .verify();
 
         verify(userRepository, times(1)).findById(1L);
@@ -260,9 +263,8 @@ public class UserServiceTest {
 
         StepVerifier.create(userService.deleteUser(1L))
                 .expectErrorMatches(
-                        throwable ->
-                                throwable instanceof ServerWebInputException
-                                        && throwable.getMessage().contains("User not found"))
+                        throwable -> throwable instanceof ServerWebInputException
+                                && throwable.getMessage().contains("User not found"))
                 .verify();
 
         verify(userRepository, times(1)).findById(1L);

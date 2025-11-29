@@ -22,27 +22,46 @@ CREATE TABLE IF NOT EXISTS user_roles (
 CREATE INDEX IF NOT EXISTS idx_user_roles_user_id ON user_roles(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_roles_role_id ON user_roles(role_id);
 
-CREATE TABLE IF NOT EXISTS projects (
+CREATE TABLE IF NOT EXISTS roadmaps (
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(255) NOT NULL,
+    project_name VARCHAR(255) NOT NULL,
     create_date TIMESTAMP NOT NULL,
+    update_date TIMESTAMP,
     author_id BIGINT NOT NULL,
     mission TEXT,
     description TEXT,
     FOREIGN KEY (author_id) REFERENCES users(id)
 );
-CREATE INDEX IF NOT EXISTS idx_projects_author_id ON projects(author_id);
-CREATE INDEX IF NOT EXISTS idx_projects_name ON projects(name);
+CREATE INDEX IF NOT EXISTS idx_roadmaps_author_id ON roadmaps(author_id);
+CREATE INDEX IF NOT EXISTS idx_roadmaps_project_name ON roadmaps(project_name);
 
-CREATE TABLE IF NOT EXISTS project_users (
-    project_id BIGINT NOT NULL,
+CREATE TABLE IF NOT EXISTS roadmap_users (
+    roadmap_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
-    PRIMARY KEY (project_id, user_id),
-    FOREIGN KEY (project_id) REFERENCES projects(id),
+    PRIMARY KEY (roadmap_id, user_id),
+    FOREIGN KEY (roadmap_id) REFERENCES roadmaps(id),
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
-CREATE INDEX IF NOT EXISTS idx_project_users_project_id ON project_users(project_id);
-CREATE INDEX IF NOT EXISTS idx_project_users_user_id ON project_users(user_id);
+CREATE INDEX IF NOT EXISTS idx_roadmap_users_roadmap_id ON roadmap_users(roadmap_id);
+CREATE INDEX IF NOT EXISTS idx_roadmap_users_user_id ON roadmap_users(user_id);
+
+CREATE TABLE IF NOT EXISTS features (
+    id BIGSERIAL PRIMARY KEY,
+    year BIGINT NOT NULL,
+    quarter VARCHAR(2) NOT NULL,
+    sprint BIGINT,
+    release VARCHAR(255),
+    summary VARCHAR(255),
+    description TEXT,
+    create_date TIMESTAMP NOT NULL,
+    update_date TIMESTAMP,
+    author_id BIGINT NOT NULL,
+    FOREIGN KEY (author_id) REFERENCES users(id)
+);
+CREATE INDEX IF NOT EXISTS idx_features_year ON features(year);
+CREATE INDEX IF NOT EXISTS idx_features_quarter ON features(quarter);
+CREATE INDEX IF NOT EXISTS idx_features_year_quarter ON features(year, quarter);
+CREATE INDEX IF NOT EXISTS idx_features_author_id ON features(author_id);
 
 INSERT INTO users (id, email, pass_hash)
 VALUES (
@@ -55,7 +74,7 @@ INSERT INTO roles (id, name, authorities)
 VALUES (
         1,
         'SUPERADMIN',
-        'USER_VIEW,USER_EDIT,ROLE_VIEW,ROLE_EDIT,PROJECT_VIEW,PROJECT_EDIT'
+        'USER_VIEW,USER_EDIT,ROLE_VIEW,ROLE_EDIT,ROADMAP_VIEW,ROADMAP_EDIT,FEATURE_VIEW,FEATURE_EDIT'
     ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)
@@ -63,5 +82,6 @@ VALUES (1, 1) ON CONFLICT (user_id, role_id) DO NOTHING;
 
 SELECT setval('users_id_seq', 10, true);
 SELECT setval('roles_id_seq', 10, true);
-SELECT setval('projects_id_seq', 10, true);
+SELECT setval('roadmaps_id_seq', 10, true);
+SELECT setval('features_id_seq', 10, true);
 
