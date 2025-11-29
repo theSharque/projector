@@ -7,10 +7,14 @@ build/
 
 # IDE
 .idea/
+!.idea/spotless-formatter.xml
 *.iws
 *.iml
 *.ipr
 .vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/extensions.json
 .settings/
 .classpath
 .factorypath
