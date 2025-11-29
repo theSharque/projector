@@ -20,8 +20,8 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class UserService {
 
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(
-            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
+    private static final Pattern EMAIL_PATTERN =
+            Pattern.compile("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
 
     private final UserRepository userRepository;
 
@@ -30,73 +30,91 @@ public class UserService {
     }
 
     public Mono<User> getUserById(Long id) {
-        return userRepository.findById(id)
+        return userRepository
+                .findById(id)
                 .switchIfEmpty(Mono.error(new ServerWebInputException("User not found")));
     }
 
     public Mono<User> getUserByEmail(String email) {
-        return userRepository.findByEmail(email)
+        return userRepository
+                .findByEmail(email)
                 .switchIfEmpty(Mono.error(new ServerWebInputException("User not found")));
     }
 
     public Mono<User> createUser(User user) {
         return validateUser(user)
                 .flatMap(valid -> userRepository.existsByEmail(user.getEmail()))
-                .flatMap(exists -> {
-                    if (exists) {
-                        return Mono.error(new ServerWebInputException("User with such email already exists"));
-                    }
-                    user.setId(null);
-                    return userRepository.save(user);
-                });
+                .flatMap(
+                        exists -> {
+                            if (exists) {
+                                return Mono.error(
+                                        new ServerWebInputException(
+                                                "User with such email already exists"));
+                            }
+                            user.setId(null);
+                            return userRepository.save(user);
+                        });
     }
 
     public Mono<User> updateUser(Long id, User user) {
         return validateUser(user)
                 .flatMap(valid -> userRepository.findById(id))
                 .switchIfEmpty(Mono.error(new ServerWebInputException("User not found")))
-                .flatMap(existingUser -> {
-                    return userRepository.findByEmail(user.getEmail())
-                            .flatMap(emailUser -> {
-                                if (!emailUser.getId().equals(id)) {
-                                    return Mono.error(new ServerWebInputException("User with such email already exists"));
-                                }
-                                return Mono.just(true);
-                            })
-                            .switchIfEmpty(Mono.just(true));
-                })
-                .flatMap(unused -> {
-                    user.setId(id);
-                    return userRepository.findById(id)
-                            .flatMap(existingUser -> {
-                                if (user.getPassHash() == null) {
-                                    user.setPassHash(existingUser.getPassHash());
-                                }
-                                return userRepository.save(user);
-                            });
-                });
+                .flatMap(
+                        existingUser -> {
+                            return userRepository
+                                    .findByEmail(user.getEmail())
+                                    .flatMap(
+                                            emailUser -> {
+                                                if (!emailUser.getId().equals(id)) {
+                                                    return Mono.error(
+                                                            new ServerWebInputException(
+                                                                    "User with such email already exists"));
+                                                }
+                                                return Mono.just(true);
+                                            })
+                                    .switchIfEmpty(Mono.just(true));
+                        })
+                .flatMap(
+                        unused -> {
+                            user.setId(id);
+                            return userRepository
+                                    .findById(id)
+                                    .flatMap(
+                                            existingUser -> {
+                                                if (user.getPassHash() == null) {
+                                                    user.setPassHash(existingUser.getPassHash());
+                                                }
+                                                return userRepository.save(user);
+                                            });
+                        });
     }
 
     @Transactional
     public Mono<Void> deleteUser(Long id) {
-        return userRepository.findById(id)
+        return userRepository
+                .findById(id)
                 .switchIfEmpty(Mono.error(new ServerWebInputException("User not found")))
-                .flatMap(user -> userRepository.deleteById(id)
-                        .then());
+                .flatMap(user -> userRepository.deleteById(id).then());
     }
 
     public Mono<User> getUser(String email, String password) {
         String login = email.toLowerCase();
-        return userRepository.findByEmail(login)
-                .flatMap(user -> {
-                    String passwordHash = sha256Hash(password);
-                    if (user.getPassHash().equals(passwordHash)) {
-                        return Mono.just(user);
-                    } else {
-                        return Mono.error(new UsernameNotFoundException("Invalid username or password"));
-                    }
-                })
-                .switchIfEmpty(Mono.error(new UsernameNotFoundException("Invalid username or password")));
+        return userRepository
+                .findByEmail(login)
+                .flatMap(
+                        user -> {
+                            String passwordHash = sha256Hash(password);
+                            if (user.getPassHash().equals(passwordHash)) {
+                                return Mono.just(user);
+                            } else {
+                                return Mono.error(
+                                        new UsernameNotFoundException(
+                                                "Invalid username or password"));
+                            }
+                        })
+                .switchIfEmpty(
+                        Mono.error(new UsernameNotFoundException("Invalid username or password")));
     }
 
     private String sha256Hash(String password) {
@@ -127,4 +145,3 @@ public class UserService {
         return Mono.just(true);
     }
 }
-

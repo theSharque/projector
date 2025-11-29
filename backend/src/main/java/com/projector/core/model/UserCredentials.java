@@ -24,4 +24,3 @@ public class UserCredentials {
     @NotBlank
     private String password;
 }
-

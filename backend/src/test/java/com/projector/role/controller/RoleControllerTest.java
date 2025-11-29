@@ -1,8 +1,15 @@
 package com.projector.role.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anySet;
+import static org.mockito.Mockito.*;
+
 import com.projector.role.model.Authority;
 import com.projector.role.model.Role;
 import com.projector.role.service.RoleService;
+import java.util.HashSet;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -14,21 +21,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.HashSet;
-import java.util.Set;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anySet;
-import static org.mockito.Mockito.*;
-
 public class RoleControllerTest {
 
-    @Mock
-    private RoleService roleService;
+    @Mock private RoleService roleService;
 
-    @InjectMocks
-    private RoleController roleController;
+    @InjectMocks private RoleController roleController;
 
     @BeforeEach
     public void setUp() {
@@ -57,8 +54,10 @@ public class RoleControllerTest {
         when(roleService.getRoleById(1L)).thenReturn(Mono.just(role));
 
         StepVerifier.create(roleController.getRoleById(1L))
-                .expectNextMatches(response -> response.getStatusCode() == HttpStatus.OK
-                        && response.getBody().equals(role))
+                .expectNextMatches(
+                        response ->
+                                response.getStatusCode() == HttpStatus.OK
+                                        && response.getBody().equals(role))
                 .verifyComplete();
 
         verify(roleService, times(1)).getRoleById(1L);
@@ -66,7 +65,8 @@ public class RoleControllerTest {
 
     @Test
     public void testGetRoleById_NotFound() {
-        when(roleService.getRoleById(1L)).thenReturn(Mono.error(new ServerWebInputException("Role not found")));
+        when(roleService.getRoleById(1L))
+                .thenReturn(Mono.error(new ServerWebInputException("Role not found")));
 
         StepVerifier.create(roleController.getRoleById(1L))
                 .expectNextMatches(response -> response.getStatusCode() == HttpStatus.NOT_FOUND)
@@ -85,8 +85,10 @@ public class RoleControllerTest {
         when(roleService.createRole(any(Role.class))).thenReturn(Mono.just(savedRole));
 
         StepVerifier.create(roleController.createRole(role))
-                .expectNextMatches(response -> response.getStatusCode() == HttpStatus.OK
-                        && response.getBody().equals(savedRole))
+                .expectNextMatches(
+                        response ->
+                                response.getStatusCode() == HttpStatus.OK
+                                        && response.getBody().equals(savedRole))
                 .verifyComplete();
 
         verify(roleService, times(1)).createRole(any(Role.class));
@@ -98,7 +100,8 @@ public class RoleControllerTest {
         role.setName("ExistingRole");
         role.setAuthorities(Set.of(Authority.USER_VIEW.getName()));
 
-        when(roleService.createRole(any(Role.class))).thenReturn(Mono.error(new ServerWebInputException("Role already exists")));
+        when(roleService.createRole(any(Role.class)))
+                .thenReturn(Mono.error(new ServerWebInputException("Role already exists")));
 
         StepVerifier.create(roleController.createRole(role))
                 .expectNextMatches(response -> response.getStatusCode() == HttpStatus.BAD_REQUEST)
@@ -114,8 +117,10 @@ public class RoleControllerTest {
         when(roleService.updateRole(anyLong(), any(Role.class))).thenReturn(Mono.just(role));
 
         StepVerifier.create(roleController.updateRole(1L, role))
-                .expectNextMatches(response -> response.getStatusCode() == HttpStatus.OK
-                        && response.getBody().equals(role))
+                .expectNextMatches(
+                        response ->
+                                response.getStatusCode() == HttpStatus.OK
+                                        && response.getBody().equals(role))
                 .verifyComplete();
 
         verify(roleService, times(1)).updateRole(eq(1L), any(Role.class));
@@ -125,7 +130,8 @@ public class RoleControllerTest {
     public void testUpdateRole_Error() {
         Role role = createRole(1L, "UpdatedRole", Set.of(Authority.USER_VIEW.getName()));
 
-        when(roleService.updateRole(anyLong(), any(Role.class))).thenReturn(Mono.error(new ServerWebInputException("Role not found")));
+        when(roleService.updateRole(anyLong(), any(Role.class)))
+                .thenReturn(Mono.error(new ServerWebInputException("Role not found")));
 
         StepVerifier.create(roleController.updateRole(1L, role))
                 .expectNextMatches(response -> response.getStatusCode() == HttpStatus.NOT_FOUND)
@@ -147,7 +153,8 @@ public class RoleControllerTest {
 
     @Test
     public void testDeleteRole_Error() {
-        when(roleService.deleteRole(1L)).thenReturn(Mono.error(new ServerWebInputException("Role not found")));
+        when(roleService.deleteRole(1L))
+                .thenReturn(Mono.error(new ServerWebInputException("Role not found")));
 
         StepVerifier.create(roleController.deleteRole(1L))
                 .expectNextMatches(response -> response.getStatusCode() == HttpStatus.NOT_FOUND)
@@ -158,14 +165,21 @@ public class RoleControllerTest {
 
     @Test
     public void testUpdateAuthorities_Success() {
-        Role role = createRole(1L, "TestRole", Set.of(Authority.USER_EDIT.getName(), Authority.ROLE_VIEW.getName()));
-        Set<String> newAuthorities = Set.of(Authority.USER_EDIT.getName(), Authority.ROLE_VIEW.getName());
+        Role role =
+                createRole(
+                        1L,
+                        "TestRole",
+                        Set.of(Authority.USER_EDIT.getName(), Authority.ROLE_VIEW.getName()));
+        Set<String> newAuthorities =
+                Set.of(Authority.USER_EDIT.getName(), Authority.ROLE_VIEW.getName());
 
         when(roleService.updateAuthorities(anyLong(), anySet())).thenReturn(Mono.just(role));
 
         StepVerifier.create(roleController.updateAuthorities(1L, newAuthorities))
-                .expectNextMatches(response -> response.getStatusCode() == HttpStatus.OK
-                        && response.getBody().equals(role))
+                .expectNextMatches(
+                        response ->
+                                response.getStatusCode() == HttpStatus.OK
+                                        && response.getBody().equals(role))
                 .verifyComplete();
 
         verify(roleService, times(1)).updateAuthorities(eq(1L), anySet());
@@ -175,7 +189,8 @@ public class RoleControllerTest {
     public void testUpdateAuthorities_Error() {
         Set<String> newAuthorities = Set.of(Authority.USER_EDIT.getName());
 
-        when(roleService.updateAuthorities(anyLong(), anySet())).thenReturn(Mono.error(new ServerWebInputException("Role not found")));
+        when(roleService.updateAuthorities(anyLong(), anySet()))
+                .thenReturn(Mono.error(new ServerWebInputException("Role not found")));
 
         StepVerifier.create(roleController.updateAuthorities(1L, newAuthorities))
                 .expectNextMatches(response -> response.getStatusCode() == HttpStatus.NOT_FOUND)
@@ -192,4 +207,3 @@ public class RoleControllerTest {
         return role;
     }
 }
-

@@ -19,24 +19,23 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI projectorOpenAPI() {
         return new OpenAPI()
-                .info(new Info()
-                        .title("Projector API")
-                        .description("Универсальная система управления проектами")
-                        .version("0.0.1-SNAPSHOT")
-                        .contact(new Contact()
-                                .name("Projector Team"))
-                        .license(new License()
-                                .name("Proprietary")))
-                .servers(List.of(
-                        new Server()
-                                .url("http://localhost:" + serverPort)
-                                .description("Local development server"),
-                        new Server()
-                                .url("https://api.projector.local")
-                                .description("Development server"),
-                        new Server()
-                                .url("https://api.projector.prod")
-                                .description("Production server")));
+                .info(
+                        new Info()
+                                .title("Projector API")
+                                .description("Универсальная система управления проектами")
+                                .version("0.0.1-SNAPSHOT")
+                                .contact(new Contact().name("Projector Team"))
+                                .license(new License().name("Proprietary")))
+                .servers(
+                        List.of(
+                                new Server()
+                                        .url("http://localhost:" + serverPort)
+                                        .description("Local development server"),
+                                new Server()
+                                        .url("https://api.projector.local")
+                                        .description("Development server"),
+                                new Server()
+                                        .url("https://api.projector.prod")
+                                        .description("Production server")));
     }
 }
-

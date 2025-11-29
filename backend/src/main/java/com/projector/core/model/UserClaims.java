@@ -20,4 +20,3 @@ public class UserClaims {
     @JsonProperty("authorities")
     private List<String> authorities;
 }
-

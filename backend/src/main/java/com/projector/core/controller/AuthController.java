@@ -43,49 +43,58 @@ public class AuthController {
     @Operation(
             summary = "Login user",
             description = "Generate JWT token and return it as a set-cookie header",
-            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                    description = "User credentials",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserCredentials.class))
-            ),
+            requestBody =
+                    @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                            description = "User credentials",
+                            content =
+                                    @Content(
+                                            mediaType = "application/json",
+                                            schema =
+                                                    @Schema(
+                                                            implementation =
+                                                                    UserCredentials.class))),
             responses = {
-                    @ApiResponse(
-                            responseCode = "204",
-                            description = "Successful login and generated JWT with user returned",
-                            headers = @Header(
-                                    name = "Set-Cookie",
-                                    description = "Cookie with JWT token",
-                                    schema = @Schema(implementation = String.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "401",
-                            description = "User not found or credentials are incorrect"
-                    )
-            }
-    )
+                @ApiResponse(
+                        responseCode = "204",
+                        description = "Successful login and generated JWT with user returned",
+                        headers =
+                                @Header(
+                                        name = "Set-Cookie",
+                                        description = "Cookie with JWT token",
+                                        schema = @Schema(implementation = String.class))),
+                @ApiResponse(
+                        responseCode = "401",
+                        description = "User not found or credentials are incorrect")
+            })
     public Mono<ResponseEntity<Object>> login(@RequestBody UserCredentials userCredentials) {
-        return userService.getUser(userCredentials.getEmail(), userCredentials.getPassword())
-                .map(user -> {
-                    List<String> authorities = Collections.emptyList();
-                    String jwt = jwtSigner.createUserJwt(user, authorities);
-                    
-                    ResponseCookie cookie = ResponseCookie.fromClientResponse(Constants.AUTH_COOKIE_NAME, jwt)
-                            .maxAge(maxAge)
-                            .path("/")
-                            .build();
-                    
-                    return ResponseEntity.noContent()
-                            .header("Set-Cookie", cookie.toString())
-                            .build();
-                })
-                .onErrorResume(throwable -> {
-                    if (throwable instanceof UsernameNotFoundException) {
-                        return Mono.error(new InvalidTokenException(INVALID_USERNAME_OR_PASSWORD));
-                    } else {
-                        return Mono.error(new InvalidTokenException(INVALID_USERNAME_OR_PASSWORD));
-                    }
-                })
+        return userService
+                .getUser(userCredentials.getEmail(), userCredentials.getPassword())
+                .map(
+                        user -> {
+                            List<String> authorities = Collections.emptyList();
+                            String jwt = jwtSigner.createUserJwt(user, authorities);
+
+                            ResponseCookie cookie =
+                                    ResponseCookie.fromClientResponse(
+                                                    Constants.AUTH_COOKIE_NAME, jwt)
+                                            .maxAge(maxAge)
+                                            .path("/")
+                                            .build();
+
+                            return ResponseEntity.noContent()
+                                    .header("Set-Cookie", cookie.toString())
+                                    .build();
+                        })
+                .onErrorResume(
+                        throwable -> {
+                            if (throwable instanceof UsernameNotFoundException) {
+                                return Mono.error(
+                                        new InvalidTokenException(INVALID_USERNAME_OR_PASSWORD));
+                            } else {
+                                return Mono.error(
+                                        new InvalidTokenException(INVALID_USERNAME_OR_PASSWORD));
+                            }
+                        })
                 .switchIfEmpty(Mono.error(new InvalidTokenException(INVALID_USERNAME_OR_PASSWORD)));
     }
 }
-

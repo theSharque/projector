@@ -21,17 +21,18 @@ import reactor.core.publisher.Mono;
 @Slf4j
 public class RoleService {
 
-    private static final Pattern VALIDATION_PATTERN = Pattern.compile("^(?:\\p{L}|[_-]|\\d|\\s(?!\\s))+$");
+    private static final Pattern VALIDATION_PATTERN =
+            Pattern.compile("^(?:\\p{L}|[_-]|\\d|\\s(?!\\s))+$");
 
     private final RoleRepository roleRepository;
 
     public Flux<Role> getAllRoles() {
-        return roleRepository.findAll()
-                .map(this::loadAuthoritiesFromString);
+        return roleRepository.findAll().map(this::loadAuthoritiesFromString);
     }
 
     public Mono<Role> getRoleById(Long id) {
-        return roleRepository.findById(id)
+        return roleRepository
+                .findById(id)
                 .map(this::loadAuthoritiesFromString)
                 .switchIfEmpty(Mono.error(new ServerWebInputException("Role not found")));
     }
@@ -39,65 +40,80 @@ public class RoleService {
     public Mono<Role> createRole(Role role) {
         return validateRole(role)
                 .flatMap(valid -> roleRepository.existsByName(role.getName()))
-                .flatMap(exists -> {
-                    if (exists) {
-                        return Mono.error(new ServerWebInputException("Role with such name already exists"));
-                    }
-                    validateAuthorities(role.getAuthorities());
-                    role.setId(null);
-                    Role roleToSave = prepareRoleForSave(role);
-                    return roleRepository.save(roleToSave)
-                            .map(this::loadAuthoritiesFromString);
-                });
+                .flatMap(
+                        exists -> {
+                            if (exists) {
+                                return Mono.error(
+                                        new ServerWebInputException(
+                                                "Role with such name already exists"));
+                            }
+                            validateAuthorities(role.getAuthorities());
+                            role.setId(null);
+                            Role roleToSave = prepareRoleForSave(role);
+                            return roleRepository
+                                    .save(roleToSave)
+                                    .map(this::loadAuthoritiesFromString);
+                        });
     }
 
     public Mono<Role> updateRole(Long id, Role role) {
         return validateRole(role)
                 .flatMap(valid -> roleRepository.existsById(id))
-                .flatMap(exists -> {
-                    if (!exists) {
-                        return Mono.error(new ServerWebInputException("Role not found"));
-                    }
-                    return roleRepository.findByName(role.getName())
-                            .flatMap(existingRole -> {
-                                if (!existingRole.getId().equals(id)) {
-                                    return Mono.error(new ServerWebInputException("Role with such name already exists"));
-                                }
-                                return Mono.just(true);
-                            })
-                            .switchIfEmpty(Mono.just(true));
-                })
-                .flatMap(unused -> {
-                    validateAuthorities(role.getAuthorities());
-                    role.setId(id);
-                    Role roleToSave = prepareRoleForSave(role);
-                    return roleRepository.save(roleToSave)
-                            .map(this::loadAuthoritiesFromString);
-                });
+                .flatMap(
+                        exists -> {
+                            if (!exists) {
+                                return Mono.error(new ServerWebInputException("Role not found"));
+                            }
+                            return roleRepository
+                                    .findByName(role.getName())
+                                    .flatMap(
+                                            existingRole -> {
+                                                if (!existingRole.getId().equals(id)) {
+                                                    return Mono.error(
+                                                            new ServerWebInputException(
+                                                                    "Role with such name already exists"));
+                                                }
+                                                return Mono.just(true);
+                                            })
+                                    .switchIfEmpty(Mono.just(true));
+                        })
+                .flatMap(
+                        unused -> {
+                            validateAuthorities(role.getAuthorities());
+                            role.setId(id);
+                            Role roleToSave = prepareRoleForSave(role);
+                            return roleRepository
+                                    .save(roleToSave)
+                                    .map(this::loadAuthoritiesFromString);
+                        });
     }
 
     @Transactional
     public Mono<Void> deleteRole(Long id) {
-        return roleRepository.existsById(id)
-                .flatMap(exists -> {
-                    if (!exists) {
-                        return Mono.error(new ServerWebInputException("Role not found"));
-                    }
-                    return roleRepository.deleteById(id)
-                            .then();
-                });
+        return roleRepository
+                .existsById(id)
+                .flatMap(
+                        exists -> {
+                            if (!exists) {
+                                return Mono.error(new ServerWebInputException("Role not found"));
+                            }
+                            return roleRepository.deleteById(id).then();
+                        });
     }
 
     public Mono<Role> updateAuthorities(Long id, Set<String> authorities) {
-        return roleRepository.findById(id)
+        return roleRepository
+                .findById(id)
                 .switchIfEmpty(Mono.error(new ServerWebInputException("Role not found")))
-                .flatMap(role -> {
-                    validateAuthorities(authorities);
-                    role.setAuthorities(authorities);
-                    Role roleToSave = prepareRoleForSave(role);
-                    return roleRepository.save(roleToSave)
-                            .map(this::loadAuthoritiesFromString);
-                });
+                .flatMap(
+                        role -> {
+                            validateAuthorities(authorities);
+                            role.setAuthorities(authorities);
+                            Role roleToSave = prepareRoleForSave(role);
+                            return roleRepository
+                                    .save(roleToSave)
+                                    .map(this::loadAuthoritiesFromString);
+                        });
     }
 
     private Mono<Boolean> validateRole(Role role) {
@@ -105,7 +121,8 @@ public class RoleService {
             return Mono.error(new ServerWebInputException("Role name cannot be empty"));
         }
         if (role.getName().length() < 2) {
-            return Mono.error(new ServerWebInputException("Role name must be at least 2 characters"));
+            return Mono.error(
+                    new ServerWebInputException("Role name must be at least 2 characters"));
         }
         Matcher matcher = VALIDATION_PATTERN.matcher(role.getName());
         if (!matcher.matches()) {
@@ -118,26 +135,28 @@ public class RoleService {
         if (authorities == null || authorities.isEmpty()) {
             return;
         }
-        Set<String> validAuthorityNames = Set.of(
-                Authority.USER_VIEW.getName(),
-                Authority.USER_EDIT.getName(),
-                Authority.ROLE_VIEW.getName(),
-                Authority.ROLE_EDIT.getName()
-        );
-        Set<String> invalidAuthorities = authorities.stream()
-                .filter(auth -> !validAuthorityNames.contains(auth))
-                .collect(Collectors.toSet());
+        Set<String> validAuthorityNames =
+                Set.of(
+                        Authority.USER_VIEW.getName(),
+                        Authority.USER_EDIT.getName(),
+                        Authority.ROLE_VIEW.getName(),
+                        Authority.ROLE_EDIT.getName());
+        Set<String> invalidAuthorities =
+                authorities.stream()
+                        .filter(auth -> !validAuthorityNames.contains(auth))
+                        .collect(Collectors.toSet());
         if (!invalidAuthorities.isEmpty()) {
-            throw new ServerWebInputException("Invalid authorities: " + String.join(", ", invalidAuthorities));
+            throw new ServerWebInputException(
+                    "Invalid authorities: " + String.join(", ", invalidAuthorities));
         }
     }
 
     private Role prepareRoleForSave(Role role) {
-        Role roleToSave = Role.builder()
-                .id(role.getId())
-                .name(role.getName())
-                .build();
-        roleToSave.setAuthorities(role.getAuthorities() != null ? new HashSet<>(role.getAuthorities()) : new HashSet<>());
+        Role roleToSave = Role.builder().id(role.getId()).name(role.getName()).build();
+        roleToSave.setAuthorities(
+                role.getAuthorities() != null
+                        ? new HashSet<>(role.getAuthorities())
+                        : new HashSet<>());
         return roleToSave;
     }
 
@@ -148,4 +167,3 @@ public class RoleService {
         return role;
     }
 }
-

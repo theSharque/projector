@@ -30,20 +30,33 @@ public class JwtServerAuthenticationConverter implements ServerAuthenticationCon
         if (exchange != null
                 && exchange.getRequest().getCookies().get(Constants.AUTH_COOKIE_NAME) != null
                 && !exchange.getRequest().getCookies().get(Constants.AUTH_COOKIE_NAME).isEmpty()) {
-            String token = exchange.getRequest().getCookies().get(Constants.AUTH_COOKIE_NAME).get(0).getValue();
+            String token =
+                    exchange.getRequest()
+                            .getCookies()
+                            .get(Constants.AUTH_COOKIE_NAME)
+                            .get(0)
+                            .getValue();
 
             try {
                 jwtSigner.validateJwt(token);
                 return Mono.just(new UsernamePasswordAuthenticationToken(token, token));
-            } catch (ExpiredJwtException | UnsupportedJwtException | MalformedJwtException | SignatureException |
-                     IllegalArgumentException | DecodingException ex) {
+            } catch (ExpiredJwtException
+                    | UnsupportedJwtException
+                    | MalformedJwtException
+                    | SignatureException
+                    | IllegalArgumentException
+                    | DecodingException ex) {
                 log.warn("Token is incorrect: {}", ex.getMessage());
                 exchange.getResponse().setStatusCode(InvalidTokenException.STATUS);
-                exchange.getResponse().getHeaders()
-                        .set("Set-Cookie", ResponseCookie.from(Constants.AUTH_COOKIE_NAME, "deleted")
-                                .path("/")
-                                .maxAge(0)
-                                .build().toString());
+                exchange.getResponse()
+                        .getHeaders()
+                        .set(
+                                "Set-Cookie",
+                                ResponseCookie.from(Constants.AUTH_COOKIE_NAME, "deleted")
+                                        .path("/")
+                                        .maxAge(0)
+                                        .build()
+                                        .toString());
 
                 return Mono.error(new InvalidTokenException("Невалидный токен"));
             }
@@ -52,4 +65,3 @@ public class JwtServerAuthenticationConverter implements ServerAuthenticationCon
         }
     }
 }
-

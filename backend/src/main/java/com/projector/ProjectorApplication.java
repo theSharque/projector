@@ -10,4 +10,3 @@ public class ProjectorApplication {
         SpringApplication.run(ProjectorApplication.class, args);
     }
 }
-
