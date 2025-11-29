@@ -4,6 +4,7 @@ import com.projector.core.config.Constants;
 import com.projector.core.exception.InvalidTokenException;
 import com.projector.core.model.UserCredentials;
 import com.projector.core.service.JwtSigner;
+import com.projector.role.repository.RoleRepository;
 import com.projector.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -11,8 +12,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -35,6 +38,7 @@ public class AuthController {
 
     private final UserService userService;
     private final JwtSigner jwtSigner;
+    private final RoleRepository roleRepository;
 
     @Value("${jwt.token.max-age:3600}")
     private long maxAge;
@@ -69,22 +73,45 @@ public class AuthController {
     public Mono<ResponseEntity<Object>> login(@RequestBody UserCredentials userCredentials) {
         return userService
                 .getUser(userCredentials.getEmail(), userCredentials.getPassword())
-                .map(
-                        user -> {
-                            List<String> authorities = Collections.emptyList();
-                            String jwt = jwtSigner.createUserJwt(user, authorities);
+                .flatMap(
+                        user ->
+                                roleRepository
+                                        .findByUserId(user.getId())
+                                        .map(
+                                                role -> {
+                                                    role.getAuthorities();
+                                                    return role.getAuthorities();
+                                                })
+                                        .collectList()
+                                        .map(
+                                                roleAuthoritiesList -> {
+                                                    Set<String> allAuthorities = new HashSet<>();
+                                                    roleAuthoritiesList.forEach(
+                                                            allAuthorities::addAll);
+                                                    return allAuthorities.stream()
+                                                            .sorted()
+                                                            .collect(Collectors.toList());
+                                                })
+                                        .defaultIfEmpty(List.of())
+                                        .map(
+                                                authorities -> {
+                                                    String jwt =
+                                                            jwtSigner.createUserJwt(
+                                                                    user, authorities);
 
-                            ResponseCookie cookie =
-                                    ResponseCookie.fromClientResponse(
-                                                    Constants.AUTH_COOKIE_NAME, jwt)
-                                            .maxAge(maxAge)
-                                            .path("/")
-                                            .build();
+                                                    ResponseCookie cookie =
+                                                            ResponseCookie.fromClientResponse(
+                                                                            Constants
+                                                                                    .AUTH_COOKIE_NAME,
+                                                                            jwt)
+                                                                    .maxAge(maxAge)
+                                                                    .path("/")
+                                                                    .build();
 
-                            return ResponseEntity.noContent()
-                                    .header("Set-Cookie", cookie.toString())
-                                    .build();
-                        })
+                                                    return ResponseEntity.noContent()
+                                                            .header("Set-Cookie", cookie.toString())
+                                                            .build();
+                                                }))
                 .onErrorResume(
                         throwable -> {
                             if (throwable instanceof UsernameNotFoundException) {
