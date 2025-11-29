@@ -22,6 +22,7 @@ public enum Authority {
                 return authority;
             }
         }
+
         throw new IllegalArgumentException("Unknown authority: " + name);
     }
 }

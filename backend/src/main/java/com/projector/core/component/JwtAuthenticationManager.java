@@ -1,20 +1,23 @@
 package com.projector.core.component;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.projector.core.model.UserClaims;
-import com.projector.core.service.JwtSigner;
-import com.projector.user.model.User;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.projector.core.model.UserClaims;
+import com.projector.core.service.JwtSigner;
+import com.projector.user.model.User;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -35,8 +38,7 @@ public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
                             String subject = jws.getPayload().getSubject();
 
                             try {
-                                UserClaims userClaims =
-                                        objectMapper.readerFor(UserClaims.class).readValue(subject);
+                                UserClaims userClaims = objectMapper.readerFor(UserClaims.class).readValue(subject);
                                 return authenticateUserToken(userClaims, authentication);
                             } catch (JsonProcessingException e) {
                                 log.error("Incorrect Token subject {}", e.getMessage());
@@ -47,19 +49,17 @@ public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
 
     private Mono<Authentication> authenticateUserToken(
             UserClaims userClaims, Authentication authentication) {
-        List<SimpleGrantedAuthority> authorities =
-                userClaims.getAuthorities() != null
-                        ? userClaims.getAuthorities().parallelStream()
-                                .distinct()
-                                .map(SimpleGrantedAuthority::new)
-                                .collect(Collectors.toList())
-                        : List.of();
+        List<SimpleGrantedAuthority> authorities = userClaims.getAuthorities() != null
+                ? userClaims.getAuthorities().parallelStream()
+                        .distinct()
+                        .map(SimpleGrantedAuthority::new)
+                        .collect(Collectors.toList())
+                : List.of();
 
         User user = userClaims.getUser();
 
         return Mono.just(
-                (Authentication)
-                        new UsernamePasswordAuthenticationToken(
-                                user, authentication.getCredentials(), authorities));
+                (Authentication) new UsernamePasswordAuthenticationToken(
+                        user, authentication.getCredentials(), authorities));
     }
 }
