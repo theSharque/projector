@@ -35,6 +35,7 @@ import reactor.core.publisher.Mono;
 public class AuthController {
 
     private static final String INVALID_USERNAME_OR_PASSWORD = "Invalid username or password";
+    private static final String INTERNAL_AUTH_ERROR = "Internal authentication error";
 
     private final UserService userService;
     private final JwtSigner jwtSigner;
@@ -118,8 +119,7 @@ public class AuthController {
                                 return Mono.error(
                                         new InvalidTokenException(INVALID_USERNAME_OR_PASSWORD));
                             } else {
-                                return Mono.error(
-                                        new InvalidTokenException(INVALID_USERNAME_OR_PASSWORD));
+                                return Mono.error(new InvalidTokenException(INTERNAL_AUTH_ERROR));
                             }
                         })
                 .switchIfEmpty(Mono.error(new InvalidTokenException(INVALID_USERNAME_OR_PASSWORD)));
