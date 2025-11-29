@@ -32,12 +32,17 @@ public class Role {
     @NotNull
     private String name;
 
-    @Schema(description = "Authorities stored as comma-separated string in database", example = "USER_VIEW,USER_EDIT,ROLE_VIEW")
+    @Schema(
+            description = "Authorities stored as comma-separated string in database",
+            example = "USER_VIEW,USER_EDIT,ROLE_VIEW")
     @Column("authorities")
     @JsonIgnore
     private String authoritiesString;
 
-    @Schema(description = "Set of authorities", example = "[\"USER_VIEW\", \"USER_EDIT\", \"ROLE_VIEW\"]", accessMode = Schema.AccessMode.READ_ONLY)
+    @Schema(
+            description = "Set of authorities",
+            example = "[\"USER_VIEW\", \"USER_EDIT\", \"ROLE_VIEW\"]",
+            accessMode = Schema.AccessMode.READ_ONLY)
     @Transient
     @JsonProperty("authorities")
     private Set<String> authorities;
@@ -63,20 +68,15 @@ public class Role {
     }
 
     public void setAuthorities(Set<String> authorities) {
-        this.authorities = authorities != null ? new HashSet<>(authorities) : Collections.emptySet();
-        this.authoritiesString = this.authorities.isEmpty()
-                ? null
-                : String.join(",", this.authorities);
+        this.authorities =
+                authorities != null ? new HashSet<>(authorities) : Collections.emptySet();
+        this.authoritiesString =
+                this.authorities.isEmpty() ? null : String.join(",", this.authorities);
     }
 
     public static Role fromAuthoritiesString(Long id, String name, String authoritiesString) {
-        Role role = Role.builder()
-                .id(id)
-                .name(name)
-                .authoritiesString(authoritiesString)
-                .build();
+        Role role = Role.builder().id(id).name(name).authoritiesString(authoritiesString).build();
         role.getAuthorities();
         return role;
     }
 }
-

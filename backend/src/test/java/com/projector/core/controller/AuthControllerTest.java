@@ -1,10 +1,15 @@
 package com.projector.core.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.Mockito.*;
+
 import com.projector.core.exception.InvalidTokenException;
 import com.projector.core.model.UserCredentials;
 import com.projector.core.service.JwtSigner;
 import com.projector.user.model.User;
 import com.projector.user.service.UserService;
+import java.util.Collections;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -16,22 +21,13 @@ import org.springframework.test.util.ReflectionTestUtils;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.util.Collections;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.Mockito.*;
-
 public class AuthControllerTest {
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
 
-    @Mock
-    private JwtSigner jwtSigner;
+    @Mock private JwtSigner jwtSigner;
 
-    @InjectMocks
-    private AuthController authController;
+    @InjectMocks private AuthController authController;
 
     @BeforeEach
     public void setUp() {
@@ -49,8 +45,10 @@ public class AuthControllerTest {
         when(jwtSigner.createUserJwt(any(User.class), anyList())).thenReturn(jwtToken);
 
         StepVerifier.create(authController.login(credentials))
-                .expectNextMatches(response -> response.getStatusCode() == HttpStatus.NO_CONTENT
-                        && response.getHeaders().containsKey("Set-Cookie"))
+                .expectNextMatches(
+                        response ->
+                                response.getStatusCode() == HttpStatus.NO_CONTENT
+                                        && response.getHeaders().containsKey("Set-Cookie"))
                 .verifyComplete();
 
         verify(userService, times(1)).getUser("admin", "admin");
@@ -62,12 +60,17 @@ public class AuthControllerTest {
         UserCredentials credentials = new UserCredentials("admin", "wrongpassword");
 
         when(userService.getUser("admin", "wrongpassword"))
-                .thenReturn(Mono.error(new UsernameNotFoundException("Invalid username or password")));
+                .thenReturn(
+                        Mono.error(new UsernameNotFoundException("Invalid username or password")));
 
         StepVerifier.create(authController.login(credentials))
-                .expectErrorMatches(throwable -> throwable instanceof InvalidTokenException
-                        && throwable.getMessage() != null
-                        && throwable.getMessage().contains("Invalid username or password"))
+                .expectErrorMatches(
+                        throwable ->
+                                throwable instanceof InvalidTokenException
+                                        && throwable.getMessage() != null
+                                        && throwable
+                                                .getMessage()
+                                                .contains("Invalid username or password"))
                 .verify();
 
         verify(userService, times(1)).getUser("admin", "wrongpassword");
@@ -79,12 +82,17 @@ public class AuthControllerTest {
         UserCredentials credentials = new UserCredentials("nonexistent", "password");
 
         when(userService.getUser("nonexistent", "password"))
-                .thenReturn(Mono.error(new UsernameNotFoundException("Invalid username or password")));
+                .thenReturn(
+                        Mono.error(new UsernameNotFoundException("Invalid username or password")));
 
         StepVerifier.create(authController.login(credentials))
-                .expectErrorMatches(throwable -> throwable instanceof InvalidTokenException
-                        && throwable.getMessage() != null
-                        && throwable.getMessage().contains("Invalid username or password"))
+                .expectErrorMatches(
+                        throwable ->
+                                throwable instanceof InvalidTokenException
+                                        && throwable.getMessage() != null
+                                        && throwable
+                                                .getMessage()
+                                                .contains("Invalid username or password"))
                 .verify();
 
         verify(userService, times(1)).getUser("nonexistent", "password");
@@ -98,9 +106,13 @@ public class AuthControllerTest {
         when(userService.getUser("admin", "admin")).thenReturn(Mono.empty());
 
         StepVerifier.create(authController.login(credentials))
-                .expectErrorMatches(throwable -> throwable instanceof InvalidTokenException
-                        && throwable.getMessage() != null
-                        && throwable.getMessage().contains("Invalid username or password"))
+                .expectErrorMatches(
+                        throwable ->
+                                throwable instanceof InvalidTokenException
+                                        && throwable.getMessage() != null
+                                        && throwable
+                                                .getMessage()
+                                                .contains("Invalid username or password"))
                 .verify();
 
         verify(userService, times(1)).getUser("admin", "admin");
@@ -117,17 +129,17 @@ public class AuthControllerTest {
         when(jwtSigner.createUserJwt(any(User.class), anyList())).thenReturn(jwtToken);
 
         StepVerifier.create(authController.login(credentials))
-                .expectNextMatches(response -> {
-                    String setCookie = response.getHeaders().getFirst("Set-Cookie");
-                    return setCookie != null
-                            && setCookie.contains("X-Auth=" + jwtToken)
-                            && setCookie.contains("Path=/")
-                            && setCookie.contains("Max-Age=3600");
-                })
+                .expectNextMatches(
+                        response -> {
+                            String setCookie = response.getHeaders().getFirst("Set-Cookie");
+                            return setCookie != null
+                                    && setCookie.contains("X-Auth=" + jwtToken)
+                                    && setCookie.contains("Path=/")
+                                    && setCookie.contains("Max-Age=3600");
+                        })
                 .verifyComplete();
 
         verify(userService, times(1)).getUser("admin", "admin");
         verify(jwtSigner, times(1)).createUserJwt(any(User.class), eq(Collections.emptyList()));
     }
 }
-

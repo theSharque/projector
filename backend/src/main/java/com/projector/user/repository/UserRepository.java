@@ -14,4 +14,3 @@ public interface UserRepository extends R2dbcRepository<User, Long> {
 
     Mono<Boolean> existsByEmail(String email);
 }
-

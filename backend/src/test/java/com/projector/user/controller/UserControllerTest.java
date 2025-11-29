@@ -1,5 +1,9 @@
 package com.projector.user.controller;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.*;
+
 import com.projector.user.model.User;
 import com.projector.user.service.UserService;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,17 +17,11 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.*;
-
 public class UserControllerTest {
 
-    @Mock
-    private UserService userService;
+    @Mock private UserService userService;
 
-    @InjectMocks
-    private UserController userController;
+    @InjectMocks private UserController userController;
 
     @BeforeEach
     public void setUp() {
@@ -52,8 +50,10 @@ public class UserControllerTest {
         when(userService.getUserById(1L)).thenReturn(Mono.just(user));
 
         StepVerifier.create(userController.getUserById(1L))
-                .expectNextMatches(response -> response.getStatusCode() == HttpStatus.OK
-                        && response.getBody().equals(user))
+                .expectNextMatches(
+                        response ->
+                                response.getStatusCode() == HttpStatus.OK
+                                        && response.getBody().equals(user))
                 .verifyComplete();
 
         verify(userService, times(1)).getUserById(1L);
@@ -61,7 +61,8 @@ public class UserControllerTest {
 
     @Test
     public void testGetUserById_NotFound() {
-        when(userService.getUserById(1L)).thenReturn(Mono.error(new ServerWebInputException("User not found")));
+        when(userService.getUserById(1L))
+                .thenReturn(Mono.error(new ServerWebInputException("User not found")));
 
         StepVerifier.create(userController.getUserById(1L))
                 .expectNextMatches(response -> response.getStatusCode() == HttpStatus.NOT_FOUND)
@@ -77,8 +78,10 @@ public class UserControllerTest {
         when(userService.getUserByEmail("test@test.com")).thenReturn(Mono.just(user));
 
         StepVerifier.create(userController.getUserByEmail("test@test.com"))
-                .expectNextMatches(response -> response.getStatusCode() == HttpStatus.OK
-                        && response.getBody().equals(user))
+                .expectNextMatches(
+                        response ->
+                                response.getStatusCode() == HttpStatus.OK
+                                        && response.getBody().equals(user))
                 .verifyComplete();
 
         verify(userService, times(1)).getUserByEmail("test@test.com");
@@ -86,7 +89,8 @@ public class UserControllerTest {
 
     @Test
     public void testGetUserByEmail_NotFound() {
-        when(userService.getUserByEmail("test@test.com")).thenReturn(Mono.error(new ServerWebInputException("User not found")));
+        when(userService.getUserByEmail("test@test.com"))
+                .thenReturn(Mono.error(new ServerWebInputException("User not found")));
 
         StepVerifier.create(userController.getUserByEmail("test@test.com"))
                 .expectNextMatches(response -> response.getStatusCode() == HttpStatus.NOT_FOUND)
@@ -103,8 +107,10 @@ public class UserControllerTest {
         when(userService.createUser(any(User.class))).thenReturn(Mono.just(savedUser));
 
         StepVerifier.create(userController.createUser(user))
-                .expectNextMatches(response -> response.getStatusCode() == HttpStatus.OK
-                        && response.getBody().equals(savedUser))
+                .expectNextMatches(
+                        response ->
+                                response.getStatusCode() == HttpStatus.OK
+                                        && response.getBody().equals(savedUser))
                 .verifyComplete();
 
         verify(userService, times(1)).createUser(any(User.class));
@@ -114,7 +120,8 @@ public class UserControllerTest {
     public void testCreateUser_Error() {
         User user = User.builder().email("test@test.com").passHash("hash").build();
 
-        when(userService.createUser(any(User.class))).thenReturn(Mono.error(new ServerWebInputException("Email already exists")));
+        when(userService.createUser(any(User.class)))
+                .thenReturn(Mono.error(new ServerWebInputException("Email already exists")));
 
         StepVerifier.create(userController.createUser(user))
                 .expectNextMatches(response -> response.getStatusCode() == HttpStatus.BAD_REQUEST)
@@ -130,8 +137,10 @@ public class UserControllerTest {
         when(userService.updateUser(anyLong(), any(User.class))).thenReturn(Mono.just(user));
 
         StepVerifier.create(userController.updateUser(1L, user))
-                .expectNextMatches(response -> response.getStatusCode() == HttpStatus.OK
-                        && response.getBody().equals(user))
+                .expectNextMatches(
+                        response ->
+                                response.getStatusCode() == HttpStatus.OK
+                                        && response.getBody().equals(user))
                 .verifyComplete();
 
         verify(userService, times(1)).updateUser(eq(1L), any(User.class));
@@ -141,7 +150,8 @@ public class UserControllerTest {
     public void testUpdateUser_Error() {
         User user = User.builder().id(1L).email("test@test.com").passHash("hash").build();
 
-        when(userService.updateUser(anyLong(), any(User.class))).thenReturn(Mono.error(new ServerWebInputException("User not found")));
+        when(userService.updateUser(anyLong(), any(User.class)))
+                .thenReturn(Mono.error(new ServerWebInputException("User not found")));
 
         StepVerifier.create(userController.updateUser(1L, user))
                 .expectNextMatches(response -> response.getStatusCode() == HttpStatus.NOT_FOUND)
@@ -163,7 +173,8 @@ public class UserControllerTest {
 
     @Test
     public void testDeleteUser_Error() {
-        when(userService.deleteUser(1L)).thenReturn(Mono.error(new ServerWebInputException("User not found")));
+        when(userService.deleteUser(1L))
+                .thenReturn(Mono.error(new ServerWebInputException("User not found")));
 
         StepVerifier.create(userController.deleteUser(1L))
                 .expectNextMatches(response -> response.getStatusCode() == HttpStatus.NOT_FOUND)
@@ -172,4 +183,3 @@ public class UserControllerTest {
         verify(userService, times(1)).deleteUser(1L);
     }
 }
-

@@ -3,8 +3,8 @@ package com.projector.core.component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.projector.core.model.UserClaims;
-import com.projector.user.model.User;
 import com.projector.core.service.JwtSigner;
+import com.projector.user.model.User;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -30,33 +30,36 @@ public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
         return Mono.just(authentication)
                 .map(auth -> jwtSigner.validateJwt((String) auth.getCredentials()))
                 .onErrorResume(err -> Mono.error(new UsernameNotFoundException("Неверный токен")))
-                .flatMap(jws -> {
-                    String subject = jws.getPayload().getSubject();
+                .flatMap(
+                        jws -> {
+                            String subject = jws.getPayload().getSubject();
 
-                    try {
-                        UserClaims userClaims = objectMapper.readerFor(UserClaims.class).readValue(subject);
-                        return authenticateUserToken(userClaims, authentication);
-                    } catch (JsonProcessingException e) {
-                        log.error("Incorrect Token subject {}", e.getMessage());
-                        return Mono.error(new UsernameNotFoundException("Неверный токен"));
-                    }
-                });
+                            try {
+                                UserClaims userClaims =
+                                        objectMapper.readerFor(UserClaims.class).readValue(subject);
+                                return authenticateUserToken(userClaims, authentication);
+                            } catch (JsonProcessingException e) {
+                                log.error("Incorrect Token subject {}", e.getMessage());
+                                return Mono.error(new UsernameNotFoundException("Неверный токен"));
+                            }
+                        });
     }
 
-    private Mono<Authentication> authenticateUserToken(UserClaims userClaims, Authentication authentication) {
-        List<SimpleGrantedAuthority> authorities = userClaims.getAuthorities() != null
-                ? userClaims.getAuthorities().parallelStream()
-                        .distinct()
-                        .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList())
-                : List.of();
+    private Mono<Authentication> authenticateUserToken(
+            UserClaims userClaims, Authentication authentication) {
+        List<SimpleGrantedAuthority> authorities =
+                userClaims.getAuthorities() != null
+                        ? userClaims.getAuthorities().parallelStream()
+                                .distinct()
+                                .map(SimpleGrantedAuthority::new)
+                                .collect(Collectors.toList())
+                        : List.of();
 
         User user = userClaims.getUser();
 
-        return Mono.just((Authentication) new UsernamePasswordAuthenticationToken(
-                user,
-                authentication.getCredentials(),
-                authorities));
+        return Mono.just(
+                (Authentication)
+                        new UsernamePasswordAuthenticationToken(
+                                user, authentication.getCredentials(), authorities));
     }
 }
-

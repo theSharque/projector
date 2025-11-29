@@ -12,4 +12,3 @@ public interface RoleRepository extends R2dbcRepository<Role, Long> {
 
     Mono<Role> findByName(String name);
 }
-

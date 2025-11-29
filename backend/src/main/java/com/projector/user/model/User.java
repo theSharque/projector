@@ -37,10 +37,6 @@ public class User {
     private String passHash;
 
     public static User forCookie(User user) {
-        return User.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .build();
+        return User.builder().id(user.getId()).email(user.getEmail()).build();
     }
 }
-

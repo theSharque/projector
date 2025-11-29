@@ -15,4 +15,3 @@ public class InvalidTokenException extends ResponseStatusException {
         super(STATUS, message, cause);
     }
 }
-

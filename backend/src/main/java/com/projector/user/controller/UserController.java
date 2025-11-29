@@ -25,16 +25,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @ApiResponses({
-        @ApiResponse(
-                responseCode = "400",
-                description = "Bad request",
-                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
-        ),
-        @ApiResponse(
-                responseCode = "500",
-                description = "Internal server error",
-                content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)
-        )
+    @ApiResponse(
+            responseCode = "400",
+            description = "Bad request",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
+    @ApiResponse(
+            responseCode = "500",
+            description = "Internal server error",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
 })
 @RestController
 @RequiredArgsConstructor
@@ -47,16 +45,19 @@ public class UserController {
             summary = "Get all users",
             description = "Retrieve a list of all active users",
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "List of users",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    array = @ArraySchema(schema = @Schema(implementation = User.class))
-                            )
-                    )
-            }
-    )
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "List of users",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        array =
+                                                @ArraySchema(
+                                                        schema =
+                                                                @Schema(
+                                                                        implementation =
+                                                                                User.class))))
+            })
     @GetMapping
     public Flux<User> getAllUsers() {
         return userService.getAllUsers();
@@ -66,32 +67,27 @@ public class UserController {
             summary = "Get user by ID",
             description = "Retrieve a specific user by its ID",
             parameters = {
-                    @Parameter(
-                            in = ParameterIn.PATH,
-                            name = "id",
-                            required = true,
-                            description = "User ID",
-                            schema = @Schema(type = "integer", format = "int64", example = "1")
-                    )
+                @Parameter(
+                        in = ParameterIn.PATH,
+                        name = "id",
+                        required = true,
+                        description = "User ID",
+                        schema = @Schema(type = "integer", format = "int64", example = "1"))
             },
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "User found",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = User.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "User not found"
-                    )
-            }
-    )
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "User found",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = User.class))),
+                @ApiResponse(responseCode = "404", description = "User not found")
+            })
     @GetMapping("/{id}")
     public Mono<ResponseEntity<User>> getUserById(@PathVariable Long id) {
-        return userService.getUserById(id)
+        return userService
+                .getUserById(id)
                 .map(ResponseEntity::ok)
                 .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
     }
@@ -100,32 +96,27 @@ public class UserController {
             summary = "Get user by email",
             description = "Retrieve a specific user by email address",
             parameters = {
-                    @Parameter(
-                            in = ParameterIn.PATH,
-                            name = "email",
-                            required = true,
-                            description = "User email",
-                            schema = @Schema(type = "string", example = "user@example.com")
-                    )
+                @Parameter(
+                        in = ParameterIn.PATH,
+                        name = "email",
+                        required = true,
+                        description = "User email",
+                        schema = @Schema(type = "string", example = "user@example.com"))
             },
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "User found",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = User.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "User not found"
-                    )
-            }
-    )
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "User found",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = User.class))),
+                @ApiResponse(responseCode = "404", description = "User not found")
+            })
     @GetMapping("/email/{email}")
     public Mono<ResponseEntity<User>> getUserByEmail(@PathVariable String email) {
-        return userService.getUserByEmail(email)
+        return userService
+                .getUserByEmail(email)
                 .map(ResponseEntity::ok)
                 .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
     }
@@ -134,23 +125,21 @@ public class UserController {
             summary = "Create a new user",
             description = "Create a new user with specified email and password",
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "User created",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = User.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Invalid input or user email already exists"
-                    )
-            }
-    )
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "User created",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = User.class))),
+                @ApiResponse(
+                        responseCode = "400",
+                        description = "Invalid input or user email already exists")
+            })
     @PostMapping
     public Mono<ResponseEntity<User>> createUser(@RequestBody User user) {
-        return userService.createUser(user)
+        return userService
+                .createUser(user)
                 .map(ResponseEntity::ok)
                 .onErrorResume(error -> Mono.just(ResponseEntity.badRequest().build()));
     }
@@ -159,73 +148,58 @@ public class UserController {
             summary = "Update an existing user",
             description = "Update user information by ID",
             parameters = {
-                    @Parameter(
-                            in = ParameterIn.PATH,
-                            name = "id",
-                            required = true,
-                            description = "User ID",
-                            schema = @Schema(type = "integer", format = "int64", example = "1")
-                    )
+                @Parameter(
+                        in = ParameterIn.PATH,
+                        name = "id",
+                        required = true,
+                        description = "User ID",
+                        schema = @Schema(type = "integer", format = "int64", example = "1"))
             },
             responses = {
-                    @ApiResponse(
-                            responseCode = "200",
-                            description = "User updated",
-                            content = @Content(
-                                    mediaType = MediaType.APPLICATION_JSON_VALUE,
-                                    schema = @Schema(implementation = User.class)
-                            )
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "User not found"
-                    ),
-                    @ApiResponse(
-                            responseCode = "400",
-                            description = "Invalid input"
-                    )
-            }
-    )
+                @ApiResponse(
+                        responseCode = "200",
+                        description = "User updated",
+                        content =
+                                @Content(
+                                        mediaType = MediaType.APPLICATION_JSON_VALUE,
+                                        schema = @Schema(implementation = User.class))),
+                @ApiResponse(responseCode = "404", description = "User not found"),
+                @ApiResponse(responseCode = "400", description = "Invalid input")
+            })
     @PutMapping("/{id}")
     public Mono<ResponseEntity<User>> updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.updateUser(id, user)
+        return userService
+                .updateUser(id, user)
                 .map(ResponseEntity::ok)
-                .onErrorResume(error -> {
-                    if (error.getMessage().contains("not found")) {
-                        return Mono.just(ResponseEntity.notFound().build());
-                    }
-                    return Mono.just(ResponseEntity.badRequest().build());
-                });
+                .onErrorResume(
+                        error -> {
+                            if (error.getMessage().contains("not found")) {
+                                return Mono.just(ResponseEntity.notFound().build());
+                            }
+                            return Mono.just(ResponseEntity.badRequest().build());
+                        });
     }
 
     @Operation(
             summary = "Delete a user",
             description = "Delete a user by ID from database",
             parameters = {
-                    @Parameter(
-                            in = ParameterIn.PATH,
-                            name = "id",
-                            required = true,
-                            description = "User ID",
-                            schema = @Schema(type = "integer", format = "int64", example = "1")
-                    )
+                @Parameter(
+                        in = ParameterIn.PATH,
+                        name = "id",
+                        required = true,
+                        description = "User ID",
+                        schema = @Schema(type = "integer", format = "int64", example = "1"))
             },
             responses = {
-                    @ApiResponse(
-                            responseCode = "204",
-                            description = "User deleted successfully"
-                    ),
-                    @ApiResponse(
-                            responseCode = "404",
-                            description = "User not found"
-                    )
-            }
-    )
+                @ApiResponse(responseCode = "204", description = "User deleted successfully"),
+                @ApiResponse(responseCode = "404", description = "User not found")
+            })
     @DeleteMapping("/{id}")
     public Mono<ResponseEntity<Void>> deleteUser(@PathVariable Long id) {
-        return userService.deleteUser(id)
+        return userService
+                .deleteUser(id)
                 .then(Mono.just(ResponseEntity.noContent().<Void>build()))
                 .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
     }
 }
-

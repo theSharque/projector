@@ -25,22 +25,28 @@ public class SecurityConfig {
         AuthenticationWebFilter jwtFilter = new AuthenticationWebFilter(jwtAuthenticationManager);
         jwtFilter.setServerAuthenticationConverter(jwtServerAuthenticationConverter);
 
-        return http
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
+        return http.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .httpBasic(ServerHttpSecurity.HttpBasicSpec::disable)
                 .formLogin(ServerHttpSecurity.FormLoginSpec::disable)
                 .logout(ServerHttpSecurity.LogoutSpec::disable)
-                .authorizeExchange(exchanges -> exchanges
-                        .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .pathMatchers("/actuator/health", "/actuator/info").permitAll()
-                        .pathMatchers("/api/auth/**").permitAll()
-                        .pathMatchers("/swagger-ui.html", "/swagger-ui/**").permitAll()
-                        .pathMatchers("/v3/api-docs", "/v3/api-docs/**").permitAll()
-                        .pathMatchers("/swagger-resources/**", "/webjars/**").permitAll()
-                        .anyExchange().authenticated()
-                )
+                .authorizeExchange(
+                        exchanges ->
+                                exchanges
+                                        .pathMatchers(HttpMethod.OPTIONS, "/**")
+                                        .permitAll()
+                                        .pathMatchers("/actuator/health", "/actuator/info")
+                                        .permitAll()
+                                        .pathMatchers("/api/auth/**")
+                                        .permitAll()
+                                        .pathMatchers("/swagger-ui.html", "/swagger-ui/**")
+                                        .permitAll()
+                                        .pathMatchers("/v3/api-docs", "/v3/api-docs/**")
+                                        .permitAll()
+                                        .pathMatchers("/swagger-resources/**", "/webjars/**")
+                                        .permitAll()
+                                        .anyExchange()
+                                        .authenticated())
                 .addFilterAt(jwtFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();
     }
 }
-

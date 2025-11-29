@@ -22,7 +22,8 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class JwtSigner {
 
-    private static final ConcurrentHashMap<String, Jws<Claims>> SIGNATURE_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, Jws<Claims>> SIGNATURE_CACHE =
+            new ConcurrentHashMap<>();
     private static final ObjectMapper objectMapper = new ObjectMapper();
 
     private final KeyPair keyPair;
@@ -36,15 +37,11 @@ public class JwtSigner {
     }
 
     public String createUserJwt(User user, List<String> authorities) {
-        UserClaims userClaims = UserClaims.builder()
-                .user(User.forCookie(user))
-                .authorities(authorities)
-                .build();
+        UserClaims userClaims =
+                UserClaims.builder().user(User.forCookie(user)).authorities(authorities).build();
         String subject;
         try {
-            subject = objectMapper
-                    .writerFor(UserClaims.class)
-                    .writeValueAsString(userClaims);
+            subject = objectMapper.writerFor(UserClaims.class).writeValueAsString(userClaims);
         } catch (JsonProcessingException e) {
             log.error("Incorrect JSON auth {}", e.getMessage());
             throw new RuntimeException(e);
@@ -63,16 +60,17 @@ public class JwtSigner {
     }
 
     public Jws<Claims> validateJwt(String jwt) {
-        return SIGNATURE_CACHE.computeIfAbsent(jwt, s -> {
-            try {
-                return Jwts.parser()
-                        .verifyWith(keyPair.getPublic())
-                        .build()
-                        .parseSignedClaims(s);
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to validate JWT", e);
-            }
-        });
+        return SIGNATURE_CACHE.computeIfAbsent(
+                jwt,
+                s -> {
+                    try {
+                        return Jwts.parser()
+                                .verifyWith(keyPair.getPublic())
+                                .build()
+                                .parseSignedClaims(s);
+                    } catch (Exception e) {
+                        throw new RuntimeException("Failed to validate JWT", e);
+                    }
+                });
     }
 }
-

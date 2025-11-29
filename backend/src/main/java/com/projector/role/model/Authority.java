@@ -1,7 +1,6 @@
 package com.projector.role.model;
 
 public enum Authority {
-
     USER_VIEW("USER_VIEW"),
     USER_EDIT("USER_EDIT"),
     ROLE_VIEW("ROLE_VIEW"),
@@ -26,4 +25,3 @@ public enum Authority {
         throw new IllegalArgumentException("Unknown authority: " + name);
     }
 }
-
