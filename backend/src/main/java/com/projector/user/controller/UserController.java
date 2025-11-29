@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -59,6 +60,7 @@ public class UserController {
                                                                                 User.class))))
             })
     @GetMapping
+    @PreAuthorize("hasAuthority('USER_VIEW')")
     public Flux<User> getAllUsers() {
         return userService.getAllUsers();
     }
@@ -85,6 +87,7 @@ public class UserController {
                 @ApiResponse(responseCode = "404", description = "User not found")
             })
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_VIEW')")
     public Mono<ResponseEntity<User>> getUserById(@PathVariable Long id) {
         return userService
                 .getUserById(id)
@@ -114,6 +117,7 @@ public class UserController {
                 @ApiResponse(responseCode = "404", description = "User not found")
             })
     @GetMapping("/email/{email}")
+    @PreAuthorize("hasAuthority('USER_VIEW')")
     public Mono<ResponseEntity<User>> getUserByEmail(@PathVariable String email) {
         return userService
                 .getUserByEmail(email)
@@ -137,6 +141,7 @@ public class UserController {
                         description = "Invalid input or user email already exists")
             })
     @PostMapping
+    @PreAuthorize("hasAuthority('USER_EDIT')")
     public Mono<ResponseEntity<User>> createUser(@RequestBody User user) {
         return userService
                 .createUser(user)
@@ -167,6 +172,7 @@ public class UserController {
                 @ApiResponse(responseCode = "400", description = "Invalid input")
             })
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_EDIT')")
     public Mono<ResponseEntity<User>> updateUser(@PathVariable Long id, @RequestBody User user) {
         return userService
                 .updateUser(id, user)
@@ -196,6 +202,7 @@ public class UserController {
                 @ApiResponse(responseCode = "404", description = "User not found")
             })
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('USER_EDIT')")
     public Mono<ResponseEntity<Void>> deleteUser(@PathVariable Long id) {
         return userService
                 .deleteUser(id)
