@@ -10,6 +10,9 @@
     "editor.insertSpaces": true,
     "editor.detectIndentation": false
   },
+  "[sql]": {
+    "editor.formatOnSave": false
+  },
   "java.format.settings.url": "",
   "java.format.settings.profile": "",
   "java.configuration.updateBuildConfiguration": "automatic",
@@ -29,15 +32,9 @@
     "qualifyStaticMembers",
     "removeUnusedImports"
   ],
-  "java.completion.importOrder": [
-    "java",
-    "javax",
-    "org",
-    "com"
-  ],
+  "java.completion.importOrder": ["java", "javax", "org", "com"],
   "files.trimTrailingWhitespace": true,
   "files.insertFinalNewline": true,
   "files.trimFinalNewlines": false,
   "files.eol": "\n"
 }
-
