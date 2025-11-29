@@ -140,7 +140,9 @@ public class RoleService {
                 Authority.USER_VIEW.getName(),
                 Authority.USER_EDIT.getName(),
                 Authority.ROLE_VIEW.getName(),
-                Authority.ROLE_EDIT.getName());
+                Authority.ROLE_EDIT.getName(),
+                Authority.PROJECT_VIEW.getName(),
+                Authority.PROJECT_EDIT.getName());
 
         Set<String> invalidAuthorities = authorities.stream()
                 .filter(auth -> !validAuthorityNames.contains(auth))

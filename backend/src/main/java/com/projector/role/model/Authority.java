@@ -4,7 +4,9 @@ public enum Authority {
     USER_VIEW("USER_VIEW"),
     USER_EDIT("USER_EDIT"),
     ROLE_VIEW("ROLE_VIEW"),
-    ROLE_EDIT("ROLE_EDIT");
+    ROLE_EDIT("ROLE_EDIT"),
+    PROJECT_VIEW("PROJECT_VIEW"),
+    PROJECT_EDIT("PROJECT_EDIT");
 
     private final String name;
 
