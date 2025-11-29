@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Transient;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -36,9 +37,14 @@ public class User {
     @Column("email")
     private String email;
 
+    @Schema(description = "User password", example = "password123")
+    @Transient
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
+
     @Schema(description = "Password hash", example = "hashed_password")
     @Column("pass_hash")
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @JsonIgnore
     private String passHash;
 
     @Schema(description = "List of role IDs assigned to the user", example = "[1, 2]")
