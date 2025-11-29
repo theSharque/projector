@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import com.projector.core.exception.InvalidTokenException;
 import com.projector.core.model.UserCredentials;
 import com.projector.core.service.JwtSigner;
+import com.projector.role.repository.RoleRepository;
 import com.projector.user.model.User;
 import com.projector.user.service.UserService;
 import java.util.Collections;
@@ -18,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.test.util.ReflectionTestUtils;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -26,6 +28,8 @@ public class AuthControllerTest {
     @Mock private UserService userService;
 
     @Mock private JwtSigner jwtSigner;
+
+    @Mock private RoleRepository roleRepository;
 
     @InjectMocks private AuthController authController;
 
@@ -42,6 +46,7 @@ public class AuthControllerTest {
         String jwtToken = "test-jwt-token";
 
         when(userService.getUser("admin", "admin")).thenReturn(Mono.just(user));
+        when(roleRepository.findByUserId(1L)).thenReturn(Flux.empty());
         when(jwtSigner.createUserJwt(any(User.class), anyList())).thenReturn(jwtToken);
 
         StepVerifier.create(authController.login(credentials))
@@ -52,6 +57,7 @@ public class AuthControllerTest {
                 .verifyComplete();
 
         verify(userService, times(1)).getUser("admin", "admin");
+        verify(roleRepository, times(1)).findByUserId(1L);
         verify(jwtSigner, times(1)).createUserJwt(any(User.class), eq(Collections.emptyList()));
     }
 
@@ -126,6 +132,7 @@ public class AuthControllerTest {
         String jwtToken = "test-jwt-token";
 
         when(userService.getUser("admin", "admin")).thenReturn(Mono.just(user));
+        when(roleRepository.findByUserId(1L)).thenReturn(Flux.empty());
         when(jwtSigner.createUserJwt(any(User.class), anyList())).thenReturn(jwtToken);
 
         StepVerifier.create(authController.login(credentials))
@@ -140,6 +147,7 @@ public class AuthControllerTest {
                 .verifyComplete();
 
         verify(userService, times(1)).getUser("admin", "admin");
+        verify(roleRepository, times(1)).findByUserId(1L);
         verify(jwtSigner, times(1)).createUserJwt(any(User.class), eq(Collections.emptyList()));
     }
 }
