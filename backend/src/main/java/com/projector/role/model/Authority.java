@@ -8,7 +8,9 @@ public enum Authority {
     ROADMAP_VIEW("ROADMAP_VIEW"),
     ROADMAP_EDIT("ROADMAP_EDIT"),
     FEATURE_VIEW("FEATURE_VIEW"),
-    FEATURE_EDIT("FEATURE_EDIT");
+    FEATURE_EDIT("FEATURE_EDIT"),
+    TASK_VIEW("TASK_VIEW"),
+    TASK_EDIT("TASK_EDIT");
 
     private final String name;
 

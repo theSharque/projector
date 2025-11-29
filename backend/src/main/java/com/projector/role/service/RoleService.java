@@ -144,7 +144,9 @@ public class RoleService {
                 Authority.ROADMAP_VIEW.getName(),
                 Authority.ROADMAP_EDIT.getName(),
                 Authority.FEATURE_VIEW.getName(),
-                Authority.FEATURE_EDIT.getName());
+                Authority.FEATURE_EDIT.getName(),
+                Authority.TASK_VIEW.getName(),
+                Authority.TASK_EDIT.getName());
 
         Set<String> invalidAuthorities = authorities.stream()
                 .filter(auth -> !validAuthorityNames.contains(auth))
