@@ -8,9 +8,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.projector.role.model.Authority;
+import com.projector.role.model.Role;
+import com.projector.role.service.RoleService;
 import java.util.HashSet;
 import java.util.Set;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -18,22 +20,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ServerWebInputException;
-
-import com.projector.role.model.Authority;
-import com.projector.role.model.Role;
-import com.projector.role.service.RoleService;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 public class RoleControllerTest {
 
-    @Mock
-    private RoleService roleService;
+    @Mock private RoleService roleService;
 
-    @InjectMocks
-    private RoleController roleController;
+    @InjectMocks private RoleController roleController;
 
     @BeforeEach
     public void setUp() {
@@ -63,8 +58,9 @@ public class RoleControllerTest {
 
         StepVerifier.create(roleController.getRoleById(1L))
                 .expectNextMatches(
-                        response -> response.getStatusCode() == HttpStatus.OK
-                                && response.getBody().equals(role))
+                        response ->
+                                response.getStatusCode() == HttpStatus.OK
+                                        && response.getBody().equals(role))
                 .verifyComplete();
 
         verify(roleService, times(1)).getRoleById(1L);
@@ -93,8 +89,9 @@ public class RoleControllerTest {
 
         StepVerifier.create(roleController.createRole(role))
                 .expectNextMatches(
-                        response -> response.getStatusCode() == HttpStatus.OK
-                                && response.getBody().equals(savedRole))
+                        response ->
+                                response.getStatusCode() == HttpStatus.OK
+                                        && response.getBody().equals(savedRole))
                 .verifyComplete();
 
         verify(roleService, times(1)).createRole(any(Role.class));
@@ -124,8 +121,9 @@ public class RoleControllerTest {
 
         StepVerifier.create(roleController.updateRole(1L, role))
                 .expectNextMatches(
-                        response -> response.getStatusCode() == HttpStatus.OK
-                                && response.getBody().equals(role))
+                        response ->
+                                response.getStatusCode() == HttpStatus.OK
+                                        && response.getBody().equals(role))
                 .verifyComplete();
 
         verify(roleService, times(1)).updateRole(eq(1L), any(Role.class));
@@ -170,18 +168,21 @@ public class RoleControllerTest {
 
     @Test
     public void testUpdateAuthorities_Success() {
-        Role role = createRole(
-                1L,
-                "TestRole",
-                Set.of(Authority.USER_EDIT.getName(), Authority.ROLE_VIEW.getName()));
-        Set<String> newAuthorities = Set.of(Authority.USER_EDIT.getName(), Authority.ROLE_VIEW.getName());
+        Role role =
+                createRole(
+                        1L,
+                        "TestRole",
+                        Set.of(Authority.USER_EDIT.getName(), Authority.ROLE_VIEW.getName()));
+        Set<String> newAuthorities =
+                Set.of(Authority.USER_EDIT.getName(), Authority.ROLE_VIEW.getName());
 
         when(roleService.updateAuthorities(anyLong(), anySet())).thenReturn(Mono.just(role));
 
         StepVerifier.create(roleController.updateAuthorities(1L, newAuthorities))
                 .expectNextMatches(
-                        response -> response.getStatusCode() == HttpStatus.OK
-                                && response.getBody().equals(role))
+                        response ->
+                                response.getStatusCode() == HttpStatus.OK
+                                        && response.getBody().equals(role))
                 .verifyComplete();
 
         verify(roleService, times(1)).updateAuthorities(eq(1L), anySet());
