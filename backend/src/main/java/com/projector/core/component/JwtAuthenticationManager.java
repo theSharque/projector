@@ -1,7 +1,6 @@
 package com.projector.core.component;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +17,7 @@ import com.projector.user.model.User;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Component
@@ -49,17 +49,18 @@ public class JwtAuthenticationManager implements ReactiveAuthenticationManager {
 
     private Mono<Authentication> authenticateUserToken(
             UserClaims userClaims, Authentication authentication) {
-        List<SimpleGrantedAuthority> authorities = userClaims.getAuthorities() != null
-                ? userClaims.getAuthorities().parallelStream()
+        Mono<List<SimpleGrantedAuthority>> authoritiesMono = userClaims.getAuthorities() != null
+                ? Flux.fromIterable(userClaims.getAuthorities())
                         .distinct()
                         .map(SimpleGrantedAuthority::new)
-                        .collect(Collectors.toList())
-                : List.of();
+                        .collectList()
+                : Mono.just(List.<SimpleGrantedAuthority>of());
 
         User user = userClaims.getUser();
 
-        return Mono.just(
+        return authoritiesMono.map(authorities ->
                 (Authentication) new UsernamePasswordAuthenticationToken(
                         user, authentication.getCredentials(), authorities));
     }
 }
+

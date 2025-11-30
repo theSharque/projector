@@ -36,7 +36,6 @@ public class Roadmap {
     private String projectName;
 
     @Schema(description = "Roadmap creation date", example = "2024-01-01T00:00:00", accessMode = Schema.AccessMode.READ_ONLY)
-    @NotNull
     @Column("create_date")
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime createDate;

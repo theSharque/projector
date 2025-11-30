@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,12 +47,14 @@ public class RoleService {
                                 new ServerWebInputException(
                                         "Role with such name already exists"));
                     }
-                    validateAuthorities(role.getAuthorities());
-                    role.setId(null);
-                    Role roleToSave = prepareRoleForSave(role);
-                    return roleRepository
-                            .save(roleToSave)
-                            .map(this::loadAuthoritiesFromString);
+                    return validateAuthorities(role.getAuthorities())
+                            .then(Mono.fromCallable(() -> {
+                                role.setId(null);
+                                return prepareRoleForSave(role);
+                            }))
+                            .flatMap(roleToSave -> roleRepository
+                                    .save(roleToSave)
+                                    .map(this::loadAuthoritiesFromString));
                 });
     }
 
@@ -77,14 +78,14 @@ public class RoleService {
                                     })
                             .switchIfEmpty(Mono.just(true));
                 })
-                .flatMap(unused -> {
-                    validateAuthorities(role.getAuthorities());
-                    role.setId(id);
-                    Role roleToSave = prepareRoleForSave(role);
-                    return roleRepository
-                            .save(roleToSave)
-                            .map(this::loadAuthoritiesFromString);
-                });
+                .flatMap(unused -> validateAuthorities(role.getAuthorities())
+                        .then(Mono.fromCallable(() -> {
+                            role.setId(id);
+                            return prepareRoleForSave(role);
+                        }))
+                        .flatMap(roleToSave -> roleRepository
+                                .save(roleToSave)
+                                .map(this::loadAuthoritiesFromString)));
     }
 
     @Transactional
@@ -103,14 +104,14 @@ public class RoleService {
         return roleRepository
                 .findById(id)
                 .switchIfEmpty(Mono.error(new ServerWebInputException("Role not found")))
-                .flatMap(role -> {
-                    validateAuthorities(authorities);
-                    role.setAuthorities(authorities);
-                    Role roleToSave = prepareRoleForSave(role);
-                    return roleRepository
-                            .save(roleToSave)
-                            .map(this::loadAuthoritiesFromString);
-                });
+                .flatMap(role -> validateAuthorities(authorities)
+                        .then(Mono.fromCallable(() -> {
+                            role.setAuthorities(authorities);
+                            return prepareRoleForSave(role);
+                        }))
+                        .flatMap(roleToSave -> roleRepository
+                                .save(roleToSave)
+                                .map(this::loadAuthoritiesFromString)));
     }
 
     private Mono<Boolean> validateRole(Role role) {
@@ -131,9 +132,9 @@ public class RoleService {
         return Mono.just(true);
     }
 
-    private void validateAuthorities(Set<String> authorities) {
+    private Mono<Void> validateAuthorities(Set<String> authorities) {
         if (authorities == null || authorities.isEmpty()) {
-            return;
+            return Mono.empty();
         }
 
         Set<String> validAuthorityNames = Set.of(
@@ -148,14 +149,17 @@ public class RoleService {
                 Authority.TASK_VIEW.getName(),
                 Authority.TASK_EDIT.getName());
 
-        Set<String> invalidAuthorities = authorities.stream()
+        return Flux.fromIterable(authorities)
                 .filter(auth -> !validAuthorityNames.contains(auth))
-                .collect(Collectors.toSet());
-
-        if (!invalidAuthorities.isEmpty()) {
-            throw new ServerWebInputException(
-                    "Invalid authorities: " + String.join(", ", invalidAuthorities));
-        }
+                .collectList()
+                .flatMap(invalidAuthoritiesList -> {
+                    if (!invalidAuthoritiesList.isEmpty()) {
+                        Set<String> invalidAuthorities = Set.copyOf(invalidAuthoritiesList);
+                        return Mono.error(new ServerWebInputException(
+                                "Invalid authorities: " + String.join(", ", invalidAuthorities)));
+                    }
+                    return Mono.empty();
+                });
     }
 
     private Role prepareRoleForSave(Role role) {

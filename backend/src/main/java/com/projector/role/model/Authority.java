@@ -1,10 +1,9 @@
 package com.projector.role.model;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public enum Authority {
     USER_VIEW("USER_VIEW"),
@@ -20,15 +19,16 @@ public enum Authority {
 
     private final String name;
 
-    private static final Set<String> AUTHORITY_NAMES = Stream.of(values())
-            .map(authority -> authority.name)
-            .collect(Collectors.toUnmodifiableSet());
+    private static final Set<String> AUTHORITY_NAMES;
     private static final Map<String, Authority> NAME_TO_AUTHORITY = new HashMap<>();
 
     static {
+        Set<String> names = new HashSet<>();
         for (Authority authority : values()) {
+            names.add(authority.name);
             NAME_TO_AUTHORITY.put(authority.name, authority);
         }
+        AUTHORITY_NAMES = Set.copyOf(names);
     }
 
     Authority(String name) {
