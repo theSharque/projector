@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ServerWebInputException;
 
 import com.projector.roadmap.model.Roadmap;
 import com.projector.roadmap.service.RoadmapService;
@@ -72,7 +73,12 @@ public class RoadmapController {
         return roadmapService
                 .createRoadmap(roadmap)
                 .map(ResponseEntity::ok)
-                .onErrorResume(error -> Mono.just(ResponseEntity.badRequest().build()));
+                .onErrorResume(error -> {
+                    if (error instanceof ServerWebInputException) {
+                        return Mono.just(ResponseEntity.badRequest().build());
+                    }
+                    return Mono.just(ResponseEntity.badRequest().build());
+                });
     }
 
     @Operation(summary = "Update an existing roadmap", description = "Update roadmap information by ID", parameters = {

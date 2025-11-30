@@ -1,10 +1,8 @@
 package com.projector.role.model;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -59,10 +57,15 @@ public class Role {
         if (authoritiesString == null || authoritiesString.isBlank()) {
             return Collections.emptySet();
         }
-        return Arrays.stream(authoritiesString.split(","))
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .collect(Collectors.toSet());
+        Set<String> result = new HashSet<>();
+        String[] parts = authoritiesString.split(",");
+        for (String part : parts) {
+            String trimmed = part.trim();
+            if (!trimmed.isEmpty()) {
+                result.add(trimmed);
+            }
+        }
+        return result;
     }
 
     public void setAuthorities(Set<String> authorities) {

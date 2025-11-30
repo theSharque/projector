@@ -1,26 +1,18 @@
 package com.projector.core.controller;
 
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.projector.core.config.Constants;
-import com.projector.core.exception.InvalidTokenException;
 import com.projector.core.model.UserCredentials;
-import com.projector.core.service.JwtSigner;
-import com.projector.role.repository.RoleRepository;
-import com.projector.user.service.UserService;
+import com.projector.core.service.AuthService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.headers.Header;
@@ -37,15 +29,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping(value = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthController {
 
-    private static final String INVALID_USERNAME_OR_PASSWORD = "Invalid username or password";
-    private static final String INTERNAL_AUTH_ERROR = "Internal authentication error";
-
-    private final UserService userService;
-    private final JwtSigner jwtSigner;
-    private final RoleRepository roleRepository;
-
-    @Value("${jwt.token.max-age:3600}")
-    private long maxAge;
+    private final AuthService authService;
 
     @PostMapping("/login")
     @Operation(summary = "Login user", description = "Generate JWT token and return it as a set-cookie header", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "User credentials", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserCredentials.class))), responses = {
@@ -53,52 +37,23 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "User not found or credentials are incorrect")
     })
     public Mono<ResponseEntity<Object>> login(@RequestBody UserCredentials userCredentials) {
-        return userService
-                .getUser(userCredentials.getEmail(), userCredentials.getPassword())
-                .flatMap(
-                        user -> roleRepository
-                                .findByUserId(user.getId())
-                                .map(
-                                        role -> {
-                                            role.getAuthorities();
-                                            return role.getAuthorities();
-                                        })
-                                .collectList()
-                                .map(
-                                        roleAuthoritiesList -> {
-                                            Set<String> allAuthorities = new HashSet<>();
-                                            roleAuthoritiesList.forEach(
-                                                    allAuthorities::addAll);
-                                            return allAuthorities.stream()
-                                                    .sorted()
-                                                    .collect(Collectors.toList());
-                                        })
-                                .defaultIfEmpty(List.of())
-                                .map(
-                                        authorities -> {
-                                            String jwt = jwtSigner.createUserJwt(
-                                                    user, authorities);
+        return authService
+                .login(userCredentials)
+                .map(cookie -> ResponseEntity.noContent()
+                        .header("Set-Cookie", cookie.toString())
+                        .build());
+    }
 
-                                            ResponseCookie cookie = ResponseCookie.fromClientResponse(
-                                                    Constants.AUTH_COOKIE_NAME,
-                                                    jwt)
-                                                    .maxAge(maxAge)
-                                                    .path("/")
-                                                    .build();
-
-                                            return ResponseEntity.noContent()
-                                                    .header("Set-Cookie", cookie.toString())
-                                                    .build();
-                                        }))
-                .onErrorResume(
-                        throwable -> {
-                            if (throwable instanceof UsernameNotFoundException) {
-                                return Mono.error(
-                                        new InvalidTokenException(INVALID_USERNAME_OR_PASSWORD));
-                            } else {
-                                return Mono.error(new InvalidTokenException(INTERNAL_AUTH_ERROR));
-                            }
-                        })
-                .switchIfEmpty(Mono.error(new InvalidTokenException(INVALID_USERNAME_OR_PASSWORD)));
+    @GetMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get current user profile", description = "Get set of authorities for the currently authenticated user", responses = {
+            @ApiResponse(responseCode = "200", description = "User authorities", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Set.class))),
+            @ApiResponse(responseCode = "401", description = "User not authenticated")
+    })
+    public Mono<ResponseEntity<Set<String>>> getProfile() {
+        return authService
+                .getCurrentUserAuthorities()
+                .map(ResponseEntity::ok)
+                .onErrorResume(error -> Mono.just(ResponseEntity.status(401).build()));
     }
 }
