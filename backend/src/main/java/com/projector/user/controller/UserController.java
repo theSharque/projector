@@ -24,6 +24,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -31,6 +32,7 @@ import reactor.core.publisher.Mono;
         @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
 })
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -104,7 +106,8 @@ public class UserController {
                 .updateUser(id, user)
                 .map(ResponseEntity::ok)
                 .onErrorResume(error -> {
-                    if (error.getMessage().contains("not found")) {
+                    log.error("Error updating user {}: {}", id, error.getMessage(), error);
+                    if (error.getMessage() != null && error.getMessage().contains("not found")) {
                         return Mono.just(ResponseEntity.notFound().build());
                     }
                     return Mono.just(ResponseEntity.badRequest().build());
