@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ServerWebInputException;
 
 import com.projector.user.model.User;
-import com.projector.user.model.UserRole;
 import com.projector.user.repository.UserRepository;
 import com.projector.user.repository.UserRoleRepository;
 
@@ -190,11 +189,7 @@ public class UserService {
         }
 
         return Flux.fromIterable(roleIds)
-                .map(roleId -> UserRole.builder()
-                        .userId(userId)
-                        .roleId(roleId)
-                        .build())
-                .flatMap(userRoleRepository::save)
+                .flatMap(roleId -> userRoleRepository.insertUserRole(userId, roleId))
                 .then();
     }
 

@@ -1,7 +1,5 @@
 package com.projector.user.controller;
 
-import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -107,14 +105,19 @@ public class UserController_e2e extends TestFunctions {
     @Order(5)
     public void testCreateUser_Success() {
         // Given
-        User newUser = createTestUser(null, "testuser@example.com", "testpass123");
+        String jsonBody = """
+                {
+                    "email": "testuser@example.com",
+                    "password": "testpass123"
+                }
+                """;
 
         // When & Then
         webTestClientWithAuth(authToken)
                 .post()
                 .uri("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(newUser)
+                .bodyValue(jsonBody)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -164,15 +167,20 @@ public class UserController_e2e extends TestFunctions {
     @Order(8)
     public void testCreateUser_WithRoles() {
         // Given - создаем пользователя с ролями
-        User newUser = createTestUserWithRoles(null, "userwithroles@example.com", "password123",
-                List.of(1L)); // Используем роль SUPERADMIN (id=1)
+        String jsonBody = """
+                {
+                    "email": "userwithroles@example.com",
+                    "password": "password123",
+                    "roleIds": [1]
+                }
+                """;
 
         // When & Then
         webTestClientWithAuth(authToken)
                 .post()
                 .uri("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(newUser)
+                .bodyValue(jsonBody)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -188,12 +196,17 @@ public class UserController_e2e extends TestFunctions {
     @Order(9)
     public void testUpdateUser_Success() {
         // Given - создаем пользователя для обновления
-        User userToCreate = createTestUser(null, "usertoupdate@example.com", "password123");
+        String createJson = """
+                {
+                    "email": "usertoupdate@example.com",
+                    "password": "password123"
+                }
+                """;
         User createdUser = webTestClientWithAuth(authToken)
                 .post()
                 .uri("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(userToCreate)
+                .bodyValue(createJson)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(User.class)
@@ -201,15 +214,21 @@ public class UserController_e2e extends TestFunctions {
                 .getResponseBody();
 
         // Обновляем пользователя
-        User updatedUser = createTestUserWithRoles(createdUser.getId(), "updated@example.com",
-                "newpassword123", List.of(1L));
+        String updateJson = String.format("""
+                {
+                    "id": %d,
+                    "email": "updated@example.com",
+                    "password": "newpassword123",
+                    "roleIds": [1]
+                }
+                """, createdUser.getId());
 
         // When & Then
         webTestClientWithAuth(authToken)
                 .put()
                 .uri("/api/users/" + createdUser.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(updatedUser)
+                .bodyValue(updateJson)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -240,12 +259,17 @@ public class UserController_e2e extends TestFunctions {
     @Order(11)
     public void testUpdateUser_WithoutPassword() {
         // Given - создаем пользователя
-        User userToCreate = createTestUser(null, "userwithoutpass@example.com", "password123");
+        String createJson = """
+                {
+                    "email": "userwithoutpass@example.com",
+                    "password": "password123"
+                }
+                """;
         User createdUser = webTestClientWithAuth(authToken)
                 .post()
                 .uri("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(userToCreate)
+                .bodyValue(createJson)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(User.class)
@@ -253,14 +277,19 @@ public class UserController_e2e extends TestFunctions {
                 .getResponseBody();
 
         // Обновляем без пароля (пароль должен остаться прежним)
-        User updatedUser = createTestUser(createdUser.getId(), "updatedwithoutpass@example.com", null);
+        String updateJson = String.format("""
+                {
+                    "id": %d,
+                    "email": "updatedwithoutpass@example.com"
+                }
+                """, createdUser.getId());
 
         // When & Then
         webTestClientWithAuth(authToken)
                 .put()
                 .uri("/api/users/" + createdUser.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(updatedUser)
+                .bodyValue(updateJson)
                 .exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -275,12 +304,17 @@ public class UserController_e2e extends TestFunctions {
     @Order(12)
     public void testDeleteUser_Success() {
         // Given - создаем пользователя для удаления
-        User userToCreate = createTestUser(null, "usertodelete@example.com", "password123");
+        String createJson = """
+                {
+                    "email": "usertodelete@example.com",
+                    "password": "password123"
+                }
+                """;
         User createdUser = webTestClientWithAuth(authToken)
                 .post()
                 .uri("/api/users")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(userToCreate)
+                .bodyValue(createJson)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody(User.class)
