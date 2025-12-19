@@ -11,9 +11,7 @@ build/
 *.iml
 *.ipr
 .vscode/
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/extensions.json
+.cursor/
 .settings/
 .classpath
 .factorypath
@@ -26,8 +24,6 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
-.cursor/
-!.cursor/worktrees.json
 
 # NetBeans
 /nbproject/private/

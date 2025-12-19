@@ -38,21 +38,18 @@ public class FeatureController {
 
     private final FeatureService featureService;
 
-    @Operation(summary = "Get all features", description = "Retrieve a list of all features", responses = {
-            @ApiResponse(responseCode = "200", description = "List of features", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Feature.class))))
-    })
+    @Operation(summary = "Get all features", description = "Retrieve a list of all features")
+    @ApiResponse(responseCode = "200", description = "List of features", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Feature.class))))
     @GetMapping
     @PreAuthorize("hasAuthority('FEATURE_VIEW')")
     public Flux<Feature> getAllFeatures() {
         return featureService.getAllFeatures();
     }
 
-    @Operation(summary = "Get feature by ID", description = "Retrieve a specific feature by its ID", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Feature ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "200", description = "Feature found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Feature.class))),
-            @ApiResponse(responseCode = "404", description = "Feature not found")
-    })
+    @Operation(summary = "Get feature by ID", description = "Retrieve a specific feature by its ID")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Feature ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "200", description = "Feature found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Feature.class)))
+    @ApiResponse(responseCode = "404", description = "Feature not found")
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('FEATURE_VIEW')")
     public Mono<ResponseEntity<Feature>> getFeatureById(@PathVariable Long id) {
@@ -62,10 +59,9 @@ public class FeatureController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
     }
 
-    @Operation(summary = "Create a new feature", description = "Create a new feature with specified details", responses = {
-            @ApiResponse(responseCode = "200", description = "Feature created", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Feature.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
+    @Operation(summary = "Create a new feature", description = "Create a new feature with specified details")
+    @ApiResponse(responseCode = "200", description = "Feature created", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Feature.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid input")
     @PostMapping
     @PreAuthorize("hasAuthority('FEATURE_EDIT')")
     public Mono<ResponseEntity<Feature>> createFeature(@RequestBody Feature feature) {
@@ -75,13 +71,11 @@ public class FeatureController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.badRequest().build()));
     }
 
-    @Operation(summary = "Update an existing feature", description = "Update feature information by ID", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Feature ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "200", description = "Feature updated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Feature.class))),
-            @ApiResponse(responseCode = "404", description = "Feature not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
+    @Operation(summary = "Update an existing feature", description = "Update feature information by ID")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Feature ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "200", description = "Feature updated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Feature.class)))
+    @ApiResponse(responseCode = "404", description = "Feature not found")
+    @ApiResponse(responseCode = "400", description = "Invalid input")
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('FEATURE_EDIT')")
     public Mono<ResponseEntity<Feature>> updateFeature(@PathVariable Long id, @RequestBody Feature feature) {
@@ -96,12 +90,10 @@ public class FeatureController {
                 });
     }
 
-    @Operation(summary = "Delete a feature", description = "Delete a feature by ID from database", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Feature ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "204", description = "Feature deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Feature not found")
-    })
+    @Operation(summary = "Delete a feature", description = "Delete a feature by ID from database")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Feature ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "204", description = "Feature deleted successfully")
+    @ApiResponse(responseCode = "404", description = "Feature not found")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('FEATURE_EDIT')")
     public Mono<ResponseEntity<Void>> deleteFeature(@PathVariable Long id) {
@@ -111,4 +103,3 @@ public class FeatureController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
     }
 }
-

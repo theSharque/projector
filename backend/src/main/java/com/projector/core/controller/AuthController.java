@@ -32,10 +32,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    @Operation(summary = "Login user", description = "Generate JWT token and return it as a set-cookie header", requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "User credentials", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserCredentials.class))), responses = {
-            @ApiResponse(responseCode = "204", description = "Successful login and generated JWT with user returned", headers = @Header(name = "Set-Cookie", description = "Cookie with JWT token", schema = @Schema(implementation = String.class))),
-            @ApiResponse(responseCode = "401", description = "User not found or credentials are incorrect")
-    })
+    @Operation(summary = "Login user", description = "Generate JWT token and return it as a set-cookie header")
+    @ApiResponse(responseCode = "204", description = "Successful login", headers = @Header(name = "Set-Cookie", description = "Cookie with JWT token"))
+    @ApiResponse(responseCode = "401", description = "User not found or credentials are incorrect")
     public Mono<ResponseEntity<Object>> login(@RequestBody UserCredentials userCredentials) {
         return authService
                 .login(userCredentials)
@@ -46,10 +45,9 @@ public class AuthController {
 
     @GetMapping("/profile")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get current user profile", description = "Get set of authorities for the currently authenticated user", responses = {
-            @ApiResponse(responseCode = "200", description = "User authorities", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Set.class))),
-            @ApiResponse(responseCode = "401", description = "User not authenticated")
-    })
+    @Operation(summary = "Get current user profile", description = "Get set of authorities for the currently authenticated user")
+    @ApiResponse(responseCode = "200", description = "User authorities", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Set.class)))
+    @ApiResponse(responseCode = "401", description = "User not authenticated")
     public Mono<ResponseEntity<Set<String>>> getProfile() {
         return authService
                 .getCurrentUserAuthorities()
