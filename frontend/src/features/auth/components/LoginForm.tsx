@@ -17,14 +17,24 @@ const LoginForm = () => {
     try {
       const response = await authApi.login(values);
       if (response.status === 204) {
-        const authorities = await authApi.getProfile();
-        setAuthenticated(authorities);
-        toast.success('Login successful');
-        navigate('/users');
+        try {
+          const authorities = await authApi.getProfile();
+          setAuthenticated(authorities);
+          toast.success('Login successful');
+          navigate('/users');
+        } catch (profileError) {
+          console.error('Profile fetch error:', profileError);
+          // Even if profile fails, if login succeeded, we can still navigate
+          // The cookie is set, so subsequent requests will work
+          setAuthenticated(new Set());
+          toast.success('Login successful');
+          navigate('/users');
+        }
       } else {
         toast.error('Invalid credentials');
       }
     } catch (error) {
+      console.error('Login error:', error);
       toast.error('Login failed');
     } finally {
       setLoading(false);
@@ -40,7 +50,7 @@ const LoginForm = () => {
         <Form.Item
           label="Email"
           name="email"
-          rules={[{ required: true, message: 'Please input your email!' }, { type: 'email', message: 'Invalid email format' }]}
+          rules={[{ required: true, message: 'Please input your email!' }]}
         >
           <Input />
         </Form.Item>

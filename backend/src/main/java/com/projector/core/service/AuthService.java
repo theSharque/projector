@@ -81,9 +81,11 @@ public class AuthService {
     }
 
     private ResponseCookie createAuthCookie(String jwt) {
-        return ResponseCookie.fromClientResponse(Constants.AUTH_COOKIE_NAME, jwt)
+        return ResponseCookie.from(Constants.AUTH_COOKIE_NAME, jwt)
                 .maxAge(maxAge)
                 .path("/")
+                .httpOnly(false)
+                .sameSite("Lax")
                 .build();
     }
 }
