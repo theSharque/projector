@@ -7,7 +7,6 @@ build/
 
 # IDE
 .idea/
-!.idea/spotless-formatter.xml
 *.iws
 *.iml
 *.ipr
@@ -27,6 +26,8 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+.cursor/
+!.cursor/worktrees.json
 
 # NetBeans
 /nbproject/private/
