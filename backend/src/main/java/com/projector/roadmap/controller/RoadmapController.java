@@ -39,21 +39,18 @@ public class RoadmapController {
 
     private final RoadmapService roadmapService;
 
-    @Operation(summary = "Get all roadmaps", description = "Retrieve a list of all roadmaps", responses = {
-            @ApiResponse(responseCode = "200", description = "List of roadmaps", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Roadmap.class))))
-    })
+    @Operation(summary = "Get all roadmaps", description = "Retrieve a list of all roadmaps")
+    @ApiResponse(responseCode = "200", description = "List of roadmaps", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Roadmap.class))))
     @GetMapping
     @PreAuthorize("hasAuthority('ROADMAP_VIEW')")
     public Flux<Roadmap> getAllRoadmaps() {
         return roadmapService.getAllRoadmaps();
     }
 
-    @Operation(summary = "Get roadmap by ID", description = "Retrieve a specific roadmap by its ID", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Roadmap ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "200", description = "Roadmap found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Roadmap.class))),
-            @ApiResponse(responseCode = "404", description = "Roadmap not found")
-    })
+    @Operation(summary = "Get roadmap by ID", description = "Retrieve a specific roadmap by its ID")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Roadmap ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "200", description = "Roadmap found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Roadmap.class)))
+    @ApiResponse(responseCode = "404", description = "Roadmap not found")
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ROADMAP_VIEW')")
     public Mono<ResponseEntity<Roadmap>> getRoadmapById(@PathVariable Long id) {
@@ -63,10 +60,9 @@ public class RoadmapController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
     }
 
-    @Operation(summary = "Create a new roadmap", description = "Create a new roadmap with specified details", responses = {
-            @ApiResponse(responseCode = "200", description = "Roadmap created", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Roadmap.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
+    @Operation(summary = "Create a new roadmap", description = "Create a new roadmap with specified details")
+    @ApiResponse(responseCode = "200", description = "Roadmap created", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Roadmap.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid input")
     @PostMapping
     @PreAuthorize("hasAuthority('ROADMAP_EDIT')")
     public Mono<ResponseEntity<Roadmap>> createRoadmap(@RequestBody Roadmap roadmap) {
@@ -81,13 +77,11 @@ public class RoadmapController {
                 });
     }
 
-    @Operation(summary = "Update an existing roadmap", description = "Update roadmap information by ID", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Roadmap ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "200", description = "Roadmap updated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Roadmap.class))),
-            @ApiResponse(responseCode = "404", description = "Roadmap not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
+    @Operation(summary = "Update an existing roadmap", description = "Update roadmap information by ID")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Roadmap ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "200", description = "Roadmap updated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Roadmap.class)))
+    @ApiResponse(responseCode = "404", description = "Roadmap not found")
+    @ApiResponse(responseCode = "400", description = "Invalid input")
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ROADMAP_EDIT')")
     public Mono<ResponseEntity<Roadmap>> updateRoadmap(@PathVariable Long id, @RequestBody Roadmap roadmap) {
@@ -102,12 +96,10 @@ public class RoadmapController {
                 });
     }
 
-    @Operation(summary = "Delete a roadmap", description = "Delete a roadmap by ID from database", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Roadmap ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "204", description = "Roadmap deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Roadmap not found")
-    })
+    @Operation(summary = "Delete a roadmap", description = "Delete a roadmap by ID from database")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Roadmap ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "204", description = "Roadmap deleted successfully")
+    @ApiResponse(responseCode = "404", description = "Roadmap not found")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ROADMAP_EDIT')")
     public Mono<ResponseEntity<Void>> deleteRoadmap(@PathVariable Long id) {

@@ -40,21 +40,18 @@ public class RoleController {
 
     private final RoleService roleService;
 
-    @Operation(summary = "Get all roles", description = "Retrieve a list of all roles with their authorities", responses = {
-            @ApiResponse(responseCode = "200", description = "List of roles", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Role.class))))
-    })
+    @Operation(summary = "Get all roles", description = "Retrieve a list of all roles with their authorities")
+    @ApiResponse(responseCode = "200", description = "List of roles", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Role.class))))
     @GetMapping
     @PreAuthorize("hasAuthority('ROLE_VIEW')")
     public Flux<Role> getAllRoles() {
         return roleService.getAllRoles();
     }
 
-    @Operation(summary = "Get role by ID", description = "Retrieve a specific role by its ID", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Role ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "200", description = "Role found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Role.class))),
-            @ApiResponse(responseCode = "404", description = "Role not found")
-    })
+    @Operation(summary = "Get role by ID", description = "Retrieve a specific role by its ID")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Role ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "200", description = "Role found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Role.class)))
+    @ApiResponse(responseCode = "404", description = "Role not found")
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_VIEW')")
     public Mono<ResponseEntity<Role>> getRoleById(@PathVariable Long id) {
@@ -64,10 +61,9 @@ public class RoleController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
     }
 
-    @Operation(summary = "Create a new role", description = "Create a new role with specified name and authorities", responses = {
-            @ApiResponse(responseCode = "200", description = "Role created", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Role.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input or role name already exists")
-    })
+    @Operation(summary = "Create a new role", description = "Create a new role with specified name and authorities")
+    @ApiResponse(responseCode = "200", description = "Role created", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Role.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid input or role name already exists")
     @PostMapping
     @PreAuthorize("hasAuthority('ROLE_EDIT')")
     public Mono<ResponseEntity<Role>> createRole(@RequestBody Role role) {
@@ -77,13 +73,11 @@ public class RoleController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.badRequest().build()));
     }
 
-    @Operation(summary = "Update an existing role", description = "Update role information by ID", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Role ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "200", description = "Role updated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Role.class))),
-            @ApiResponse(responseCode = "404", description = "Role not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
+    @Operation(summary = "Update an existing role", description = "Update role information by ID")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Role ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "200", description = "Role updated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Role.class)))
+    @ApiResponse(responseCode = "404", description = "Role not found")
+    @ApiResponse(responseCode = "400", description = "Invalid input")
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_EDIT')")
     public Mono<ResponseEntity<Role>> updateRole(@PathVariable Long id, @RequestBody Role role) {
@@ -98,12 +92,10 @@ public class RoleController {
                 });
     }
 
-    @Operation(summary = "Delete a role", description = "Delete a role by ID", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Role ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "204", description = "Role deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Role not found")
-    })
+    @Operation(summary = "Delete a role", description = "Delete a role by ID")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Role ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "204", description = "Role deleted successfully")
+    @ApiResponse(responseCode = "404", description = "Role not found")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('ROLE_EDIT')")
     public Mono<ResponseEntity<Void>> deleteRole(@PathVariable Long id) {
@@ -113,13 +105,11 @@ public class RoleController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
     }
 
-    @Operation(summary = "Update role authorities", description = "Update authorities for a specific role", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Role ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "200", description = "Authorities updated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Role.class))),
-            @ApiResponse(responseCode = "404", description = "Role not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid authorities")
-    })
+    @Operation(summary = "Update role authorities", description = "Update authorities for a specific role")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Role ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "200", description = "Authorities updated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Role.class)))
+    @ApiResponse(responseCode = "404", description = "Role not found")
+    @ApiResponse(responseCode = "400", description = "Invalid authorities")
     @PostMapping("/{id}/authorities")
     @PreAuthorize("hasAuthority('ROLE_EDIT')")
     public Mono<ResponseEntity<Role>> updateAuthorities(

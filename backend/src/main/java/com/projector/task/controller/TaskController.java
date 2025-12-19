@@ -38,21 +38,18 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    @Operation(summary = "Get all tasks", description = "Retrieve a list of all tasks", responses = {
-            @ApiResponse(responseCode = "200", description = "List of tasks", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Task.class))))
-    })
+    @Operation(summary = "Get all tasks", description = "Retrieve a list of all tasks")
+    @ApiResponse(responseCode = "200", description = "List of tasks", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = Task.class))))
     @GetMapping
     @PreAuthorize("hasAuthority('TASK_VIEW')")
     public Flux<Task> getAllTasks() {
         return taskService.getAllTasks();
     }
 
-    @Operation(summary = "Get task by ID", description = "Retrieve a specific task by its ID", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Task ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "200", description = "Task found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Task.class))),
-            @ApiResponse(responseCode = "404", description = "Task not found")
-    })
+    @Operation(summary = "Get task by ID", description = "Retrieve a specific task by its ID")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Task ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "200", description = "Task found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Task.class)))
+    @ApiResponse(responseCode = "404", description = "Task not found")
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('TASK_VIEW')")
     public Mono<ResponseEntity<Task>> getTaskById(@PathVariable Long id) {
@@ -62,10 +59,9 @@ public class TaskController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
     }
 
-    @Operation(summary = "Create a new task", description = "Create a new task with specified details", responses = {
-            @ApiResponse(responseCode = "200", description = "Task created", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Task.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
+    @Operation(summary = "Create a new task", description = "Create a new task with specified details")
+    @ApiResponse(responseCode = "200", description = "Task created", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Task.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid input")
     @PostMapping
     @PreAuthorize("hasAuthority('TASK_EDIT')")
     public Mono<ResponseEntity<Task>> createTask(@RequestBody Task task) {
@@ -75,13 +71,11 @@ public class TaskController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.badRequest().build()));
     }
 
-    @Operation(summary = "Update an existing task", description = "Update task information by ID", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Task ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "200", description = "Task updated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Task.class))),
-            @ApiResponse(responseCode = "404", description = "Task not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
+    @Operation(summary = "Update an existing task", description = "Update task information by ID")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Task ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "200", description = "Task updated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = Task.class)))
+    @ApiResponse(responseCode = "404", description = "Task not found")
+    @ApiResponse(responseCode = "400", description = "Invalid input")
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('TASK_EDIT')")
     public Mono<ResponseEntity<Task>> updateTask(@PathVariable Long id, @RequestBody Task task) {
@@ -96,12 +90,10 @@ public class TaskController {
                 });
     }
 
-    @Operation(summary = "Delete a task", description = "Delete a task by ID from database", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Task ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "204", description = "Task deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "Task not found")
-    })
+    @Operation(summary = "Delete a task", description = "Delete a task by ID from database")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "Task ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "204", description = "Task deleted successfully")
+    @ApiResponse(responseCode = "404", description = "Task not found")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('TASK_EDIT')")
     public Mono<ResponseEntity<Void>> deleteTask(@PathVariable Long id) {
@@ -111,4 +103,3 @@ public class TaskController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
     }
 }
-

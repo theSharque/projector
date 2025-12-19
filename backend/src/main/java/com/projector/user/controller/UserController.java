@@ -40,21 +40,18 @@ public class UserController {
 
     private final UserService userService;
 
-    @Operation(summary = "Get all users", description = "Retrieve a list of all active users", responses = {
-            @ApiResponse(responseCode = "200", description = "List of users", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = User.class))))
-    })
+    @Operation(summary = "Get all users", description = "Retrieve a list of all active users")
+    @ApiResponse(responseCode = "200", description = "List of users", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, array = @ArraySchema(schema = @Schema(implementation = User.class))))
     @GetMapping
     @PreAuthorize("hasAuthority('USER_VIEW')")
     public Flux<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @Operation(summary = "Get user by ID", description = "Retrieve a specific user by its ID", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "User ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "200", description = "User found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class))),
-            @ApiResponse(responseCode = "404", description = "User not found")
-    })
+    @Operation(summary = "Get user by ID", description = "Retrieve a specific user by its ID")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "User ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "200", description = "User found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class)))
+    @ApiResponse(responseCode = "404", description = "User not found")
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_VIEW')")
     public Mono<ResponseEntity<User>> getUserById(@PathVariable Long id) {
@@ -64,12 +61,10 @@ public class UserController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
     }
 
-    @Operation(summary = "Get user by email", description = "Retrieve a specific user by email address", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "email", required = true, description = "User email", schema = @Schema(type = "string", example = "user@example.com"))
-    }, responses = {
-            @ApiResponse(responseCode = "200", description = "User found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class))),
-            @ApiResponse(responseCode = "404", description = "User not found")
-    })
+    @Operation(summary = "Get user by email", description = "Retrieve a specific user by email address")
+    @Parameter(in = ParameterIn.PATH, name = "email", required = true, description = "User email", schema = @Schema(type = "string", example = "user@example.com"))
+    @ApiResponse(responseCode = "200", description = "User found", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class)))
+    @ApiResponse(responseCode = "404", description = "User not found")
     @GetMapping("/email/{email}")
     @PreAuthorize("hasAuthority('USER_VIEW')")
     public Mono<ResponseEntity<User>> getUserByEmail(@PathVariable String email) {
@@ -79,10 +74,9 @@ public class UserController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.notFound().build()));
     }
 
-    @Operation(summary = "Create a new user", description = "Create a new user with specified email and password", responses = {
-            @ApiResponse(responseCode = "200", description = "User created", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid input or user email already exists")
-    })
+    @Operation(summary = "Create a new user", description = "Create a new user with specified email and password")
+    @ApiResponse(responseCode = "200", description = "User created", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class)))
+    @ApiResponse(responseCode = "400", description = "Invalid input or user email already exists")
     @PostMapping
     @PreAuthorize("hasAuthority('USER_EDIT')")
     public Mono<ResponseEntity<User>> createUser(@RequestBody User user) {
@@ -92,13 +86,11 @@ public class UserController {
                 .onErrorResume(error -> Mono.just(ResponseEntity.badRequest().build()));
     }
 
-    @Operation(summary = "Update an existing user", description = "Update user information by ID", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "User ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "200", description = "User updated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class))),
-            @ApiResponse(responseCode = "404", description = "User not found"),
-            @ApiResponse(responseCode = "400", description = "Invalid input")
-    })
+    @Operation(summary = "Update an existing user", description = "Update user information by ID")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "User ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "200", description = "User updated", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE, schema = @Schema(implementation = User.class)))
+    @ApiResponse(responseCode = "404", description = "User not found")
+    @ApiResponse(responseCode = "400", description = "Invalid input")
     @PutMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_EDIT')")
     public Mono<ResponseEntity<User>> updateUser(@PathVariable Long id, @RequestBody User user) {
@@ -114,12 +106,10 @@ public class UserController {
                 });
     }
 
-    @Operation(summary = "Delete a user", description = "Delete a user by ID from database", parameters = {
-            @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "User ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
-    }, responses = {
-            @ApiResponse(responseCode = "204", description = "User deleted successfully"),
-            @ApiResponse(responseCode = "404", description = "User not found")
-    })
+    @Operation(summary = "Delete a user", description = "Delete a user by ID from database")
+    @Parameter(in = ParameterIn.PATH, name = "id", required = true, description = "User ID", schema = @Schema(type = "integer", format = "int64", example = "1"))
+    @ApiResponse(responseCode = "204", description = "User deleted successfully")
+    @ApiResponse(responseCode = "404", description = "User not found")
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('USER_EDIT')")
     public Mono<ResponseEntity<Void>> deleteUser(@PathVariable Long id) {
