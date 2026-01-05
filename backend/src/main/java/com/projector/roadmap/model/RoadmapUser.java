@@ -17,6 +17,8 @@ import lombok.NoArgsConstructor;
 public class RoadmapUser {
 
     @Id
+    private Long id;
+
     @Column("roadmap_id")
     private Long roadmapId;
 

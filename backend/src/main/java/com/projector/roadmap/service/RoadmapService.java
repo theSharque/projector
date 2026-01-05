@@ -122,11 +122,7 @@ public class RoadmapService {
         }
 
         return Flux.fromIterable(participantIds)
-                .map(userId -> RoadmapUser.builder()
-                        .roadmapId(roadmapId)
-                        .userId(userId)
-                        .build())
-                .flatMap(roadmapUserRepository::save)
+                .flatMap(userId -> roadmapUserRepository.insertRoadmapUser(roadmapId, userId))
                 .then();
     }
 

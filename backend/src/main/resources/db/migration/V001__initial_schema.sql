@@ -36,11 +36,12 @@ CREATE INDEX IF NOT EXISTS idx_roadmaps_author_id ON roadmaps(author_id);
 CREATE INDEX IF NOT EXISTS idx_roadmaps_project_name ON roadmaps(project_name);
 
 CREATE TABLE IF NOT EXISTS roadmap_users (
+    id BIGSERIAL PRIMARY KEY,
     roadmap_id BIGINT NOT NULL,
     user_id BIGINT NOT NULL,
-    PRIMARY KEY (roadmap_id, user_id),
     FOREIGN KEY (roadmap_id) REFERENCES roadmaps(id),
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    UNIQUE (roadmap_id, user_id)
 );
 CREATE INDEX IF NOT EXISTS idx_roadmap_users_roadmap_id ON roadmap_users(roadmap_id);
 CREATE INDEX IF NOT EXISTS idx_roadmap_users_user_id ON roadmap_users(user_id);

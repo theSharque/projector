@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -32,6 +33,7 @@ import reactor.core.publisher.Mono;
         @ApiResponse(responseCode = "400", description = "Bad request", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE)),
         @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE))
 })
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/roadmaps", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -70,6 +72,7 @@ public class RoadmapController {
                 .createRoadmap(roadmap)
                 .map(ResponseEntity::ok)
                 .onErrorResume(error -> {
+                    log.error("Error creating roadmap: {}", error.getMessage(), error);
                     if (error instanceof ServerWebInputException) {
                         return Mono.just(ResponseEntity.badRequest().build());
                     }
