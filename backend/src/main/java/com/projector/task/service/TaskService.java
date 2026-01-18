@@ -70,6 +70,10 @@ public class TaskService {
             return Mono.error(new ServerWebInputException("Task feature ID is required"));
         }
 
+        if (task.getRoadmapId() == null) {
+            return Mono.error(new ServerWebInputException("Task roadmap ID is required"));
+        }
+
         if (task.getAuthorId() == null) {
             return Mono.error(new ServerWebInputException("Task author is required"));
         }
@@ -77,4 +81,3 @@ public class TaskService {
         return Mono.just(true);
     }
 }
-

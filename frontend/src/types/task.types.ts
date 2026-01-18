@@ -4,6 +4,7 @@ import type { User } from './user.types';
 export interface Task {
   id: number;
   featureId: number;
+  roadmapId: number;
   summary?: string;
   description?: string;
   createDate?: string;

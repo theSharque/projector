@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { Table, Button, Space, Popconfirm, message, Select } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
-import { taskApi, featureApi, userApi } from '@/api';
-import type { Task, Feature, User } from '@/types/api.types';
+import { featureApi, roadmapApi, taskApi, userApi } from '@/api';
 import Loading from '@/components/common/Loading';
+import type { Feature, Roadmap, Task, User } from '@/types/api.types';
+import { DeleteOutlined, EditOutlined, PlusOutlined } from '@ant-design/icons';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Popconfirm, Select, Space, Table, message } from 'antd';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const TaskListPage = () => {
   const navigate = useNavigate();
@@ -27,6 +27,11 @@ const TaskListPage = () => {
     queryFn: userApi.getAll,
   });
 
+  const { data: roadmaps = [] } = useQuery({
+    queryKey: ['roadmaps'],
+    queryFn: roadmapApi.getAll,
+  });
+
   const deleteMutation = useMutation({
     mutationFn: taskApi.delete,
     onSuccess: () => {
@@ -40,6 +45,7 @@ const TaskListPage = () => {
 
   const featureMap = new Map(features.map((feature: Feature) => [feature.id, feature]));
   const userMap = new Map(users.map((user: User) => [user.id, user.email]));
+  const roadmapMap = new Map(roadmaps.map((roadmap: Roadmap) => [roadmap.id, roadmap]));
 
   const filteredTasks = tasks.filter((task: Task) => {
     if (featureFilter && task.featureId !== featureFilter) return false;
@@ -63,6 +69,14 @@ const TaskListPage = () => {
       render: (_: unknown, record: Task) => {
         const feature = featureMap.get(record.featureId);
         return feature ? formatFeatureLabel(feature) : `Feature ${record.featureId}`;
+      },
+    },
+    {
+      title: 'Roadmap',
+      key: 'roadmap',
+      render: (_: unknown, record: Task) => {
+        const roadmap = roadmapMap.get(record.roadmapId);
+        return roadmap ? roadmap.projectName : `Roadmap ${record.roadmapId}`;
       },
     },
     {

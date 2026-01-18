@@ -31,6 +31,11 @@ public class Task {
     @Column("feature_id")
     private Long featureId;
 
+    @Schema(description = "Roadmap ID this task belongs to", example = "1")
+    @NotNull
+    @Column("roadmap_id")
+    private Long roadmapId;
+
     @Schema(description = "Task summary", example = "Implement user authentication")
     @Column("summary")
     private String summary;
@@ -53,4 +58,3 @@ public class Task {
     @Column("author_id")
     private Long authorId;
 }
-

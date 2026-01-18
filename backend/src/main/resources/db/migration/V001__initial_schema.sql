@@ -67,15 +67,18 @@ CREATE INDEX IF NOT EXISTS idx_features_author_id ON features(author_id);
 CREATE TABLE IF NOT EXISTS tasks (
     id BIGSERIAL PRIMARY KEY,
     feature_id BIGINT NOT NULL,
+    roadmap_id BIGINT NOT NULL,
     summary VARCHAR(255),
     description TEXT,
     create_date TIMESTAMP NOT NULL,
     update_date TIMESTAMP,
     author_id BIGINT NOT NULL,
     FOREIGN KEY (feature_id) REFERENCES features(id),
+    FOREIGN KEY (roadmap_id) REFERENCES roadmaps(id),
     FOREIGN KEY (author_id) REFERENCES users(id)
 );
 CREATE INDEX IF NOT EXISTS idx_tasks_feature_id ON tasks(feature_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_roadmap_id ON tasks(roadmap_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_author_id ON tasks(author_id);
 
 INSERT INTO users (id, email, pass_hash)

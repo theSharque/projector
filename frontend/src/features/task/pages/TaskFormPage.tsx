@@ -1,11 +1,12 @@
-import { useParams, useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Card, Space, message } from 'antd';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { taskApi } from '@/api';
-import type { Task } from '@/types/api.types';
-import FeatureSelector from '@/components/relations/FeatureSelector';
-import UserSelector from '@/components/relations/UserSelector';
 import Loading from '@/components/common/Loading';
+import FeatureSelector from '@/components/relations/FeatureSelector';
+import RoadmapSelector from '@/components/relations/RoadmapSelector';
+import UserSelector from '@/components/relations/UserSelector';
+import type { Task } from '@/types/api.types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Button, Card, Form, Input, Space, message } from 'antd';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const { TextArea } = Input;
 
@@ -71,6 +72,14 @@ const TaskFormPage = () => {
           rules={[{ required: true, message: 'Please select feature!' }]}
         >
           <FeatureSelector />
+        </Form.Item>
+
+        <Form.Item
+          label="Roadmap"
+          name="roadmapId"
+          rules={[{ required: true, message: 'Please select roadmap!' }]}
+        >
+          <RoadmapSelector />
         </Form.Item>
 
         <Form.Item
