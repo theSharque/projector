@@ -23,5 +23,4 @@ public interface RoadmapUserRepository extends R2dbcRepository<RoadmapUser, Long
     @Modifying
     @Query("INSERT INTO roadmap_users (roadmap_id, user_id) VALUES (:roadmapId, :userId)")
     Mono<Integer> insertRoadmapUser(Long roadmapId, Long userId);
-
 }
