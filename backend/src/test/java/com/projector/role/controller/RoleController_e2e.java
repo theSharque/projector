@@ -3,8 +3,10 @@ package com.projector.role.controller;
 import java.util.Set;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -17,6 +19,7 @@ import com.projector.role.model.Role;
  * Тестирует controller, service, repository без моков.
  */
 @DirtiesContext
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RoleController_e2e extends TestFunctions {
 
     private String authToken;

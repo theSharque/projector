@@ -3,12 +3,18 @@ package com.projector.functionalarea.controller;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 
 import com.projector.TestFunctions;
 import com.projector.functionalarea.model.FunctionalArea;
 
+@DirtiesContext
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class FunctionalAreaController_e2e extends TestFunctions {
 
     private String authToken;
