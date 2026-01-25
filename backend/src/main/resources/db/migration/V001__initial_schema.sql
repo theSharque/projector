@@ -46,6 +46,15 @@ CREATE TABLE IF NOT EXISTS roadmap_users (
 CREATE INDEX IF NOT EXISTS idx_roadmap_users_roadmap_id ON roadmap_users(roadmap_id);
 CREATE INDEX IF NOT EXISTS idx_roadmap_users_user_id ON roadmap_users(user_id);
 
+CREATE TABLE IF NOT EXISTS functional_areas (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE,
+    description TEXT,
+    create_date TIMESTAMP NOT NULL,
+    update_date TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS idx_functional_areas_name ON functional_areas(name);
+
 CREATE TABLE IF NOT EXISTS features (
     id BIGSERIAL PRIMARY KEY,
     year BIGINT NOT NULL,
@@ -57,12 +66,14 @@ CREATE TABLE IF NOT EXISTS features (
     create_date TIMESTAMP NOT NULL,
     update_date TIMESTAMP,
     author_id BIGINT NOT NULL,
+    functional_area_ids BIGINT[],
     FOREIGN KEY (author_id) REFERENCES users(id)
 );
 CREATE INDEX IF NOT EXISTS idx_features_year ON features(year);
 CREATE INDEX IF NOT EXISTS idx_features_quarter ON features(quarter);
 CREATE INDEX IF NOT EXISTS idx_features_year_quarter ON features(year, quarter);
 CREATE INDEX IF NOT EXISTS idx_features_author_id ON features(author_id);
+CREATE INDEX IF NOT EXISTS idx_features_functional_area_ids ON features USING GIN(functional_area_ids);
 
 CREATE TABLE IF NOT EXISTS tasks (
     id BIGSERIAL PRIMARY KEY,
@@ -92,7 +103,7 @@ INSERT INTO roles (id, name, authorities)
 VALUES (
         1,
         'SUPERADMIN',
-        'USER_VIEW,USER_EDIT,ROLE_VIEW,ROLE_EDIT,ROADMAP_VIEW,ROADMAP_EDIT,FEATURE_VIEW,FEATURE_EDIT,TASK_VIEW,TASK_EDIT'
+        'USER_VIEW,USER_EDIT,ROLE_VIEW,ROLE_EDIT,ROADMAP_VIEW,ROADMAP_EDIT,FEATURE_VIEW,FEATURE_EDIT,TASK_VIEW,TASK_EDIT,FA_VIEW,FA_EDIT'
     ) ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)
@@ -101,6 +112,7 @@ VALUES (1, 1) ON CONFLICT (user_id, role_id) DO NOTHING;
 SELECT setval('users_id_seq', 10, true);
 SELECT setval('roles_id_seq', 10, true);
 SELECT setval('roadmaps_id_seq', 10, true);
+SELECT setval('functional_areas_id_seq', 10, true);
 SELECT setval('features_id_seq', 10, true);
 SELECT setval('tasks_id_seq', 10, true);
 

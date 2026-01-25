@@ -8,6 +8,7 @@ import org.springframework.web.server.ServerWebInputException;
 
 import com.projector.feature.model.Feature;
 import com.projector.feature.repository.FeatureRepository;
+import com.projector.functionalarea.repository.FunctionalAreaRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,6 +21,7 @@ import reactor.core.publisher.Mono;
 public class FeatureService {
 
     private final FeatureRepository featureRepository;
+    private final FunctionalAreaRepository functionalAreaRepository;
 
     public Flux<Feature> getAllFeatures() {
         return featureRepository.findAll();
@@ -82,7 +84,16 @@ public class FeatureService {
             return Mono.error(new ServerWebInputException("Feature author is required"));
         }
 
-        return Mono.just(true);
+        // Validate functional area IDs
+        if (feature.getFunctionalAreaIds() == null || feature.getFunctionalAreaIds().isEmpty()) {
+            return Mono.error(new ServerWebInputException("At least one functional area is required"));
+        }
+
+        // Validate that all functional area IDs exist
+        return Flux.fromIterable(feature.getFunctionalAreaIds())
+                .flatMap(faId -> functionalAreaRepository.findById(faId)
+                        .switchIfEmpty(Mono.error(new ServerWebInputException("Functional area with ID " + faId + " not found"))))
+                .then(Mono.just(true));
     }
 }
 

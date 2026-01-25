@@ -220,5 +220,81 @@ public class FeatureController_e2e extends TestFunctions {
                 .exchange()
                 .expectStatus().isUnauthorized();
     }
+
+    @Test
+    @Order(10)
+    public void testCreateFeatureWithoutFunctionalAreas() {
+        // Given - feature without functional area IDs
+        Feature newFeature = createTestFeature(null, 2024L, Quarter.Q1, 1L,
+                "Feature without FA", "Should fail validation");
+
+        // When & Then - should return 400 because functional area IDs are required
+        webTestClientWithAuth(authToken)
+                .post()
+                .uri("/api/features")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newFeature)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(11)
+    public void testCreateFeatureWithInvalidFunctionalAreaId() {
+        // Given - feature with non-existent functional area ID
+        Feature newFeature = createTestFeature(null, 2024L, Quarter.Q1, 1L,
+                "Feature with invalid FA", "Should fail validation");
+        newFeature.setFunctionalAreaIds(java.util.List.of(9999L));
+
+        // When & Then - should return 400 because FA ID doesn't exist
+        webTestClientWithAuth(authToken)
+                .post()
+                .uri("/api/features")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newFeature)
+                .exchange()
+                .expectStatus().isBadRequest();
+    }
+
+    @Test
+    @Order(12)
+    public void testCreateFeatureWithValidFunctionalAreas() {
+        // Given - create a functional area first
+        com.projector.functionalarea.model.FunctionalArea fa = com.projector.functionalarea.model.FunctionalArea.builder()
+                .name("Test FA for Feature")
+                .description("Test functional area")
+                .build();
+
+        com.projector.functionalarea.model.FunctionalArea createdFa = webTestClientWithAuth(authToken)
+                .post()
+                .uri("/api/functional-areas")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(fa)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(com.projector.functionalarea.model.FunctionalArea.class)
+                .returnResult()
+                .getResponseBody();
+
+        // Create feature with valid functional area
+        Feature newFeature = createTestFeature(null, 2024L, Quarter.Q1, 1L,
+                "Feature with valid FA", "Should succeed");
+        newFeature.setFunctionalAreaIds(java.util.List.of(createdFa.getId()));
+
+        // When & Then - should succeed
+        webTestClientWithAuth(authToken)
+                .post()
+                .uri("/api/features")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(newFeature)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Feature.class)
+                .value(feature -> {
+                    assert feature != null;
+                    assert feature.getId() != null;
+                    assert feature.getFunctionalAreaIds().contains(createdFa.getId());
+                });
+    }
 }
 

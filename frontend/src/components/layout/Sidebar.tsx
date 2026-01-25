@@ -6,6 +6,7 @@ import {
   ProjectOutlined,
   AppstoreOutlined,
   CheckSquareOutlined,
+  FolderOutlined,
 } from '@ant-design/icons';
 
 const { Sider } = Layout;
@@ -29,6 +30,11 @@ const Sidebar = () => {
       key: '/roadmaps',
       icon: <ProjectOutlined />,
       label: 'Roadmaps',
+    },
+    {
+      key: '/functional-areas',
+      icon: <FolderOutlined />,
+      label: 'Functional Areas',
     },
     {
       key: '/features',

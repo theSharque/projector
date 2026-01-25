@@ -1,6 +1,7 @@
 package com.projector.feature.model;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -69,4 +70,9 @@ public class Feature {
     @Schema(description = "Feature description", example = "Detailed description of the feature")
     @Column("description")
     private String description;
+
+    @Schema(description = "Functional area IDs", example = "[1, 2, 3]")
+    @NotNull
+    @Column("functional_area_ids")
+    private List<Long> functionalAreaIds;
 }
