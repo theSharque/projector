@@ -15,7 +15,9 @@ public enum Authority {
     FEATURE_VIEW("FEATURE_VIEW"),
     FEATURE_EDIT("FEATURE_EDIT"),
     TASK_VIEW("TASK_VIEW"),
-    TASK_EDIT("TASK_EDIT");
+    TASK_EDIT("TASK_EDIT"),
+    FA_VIEW("FA_VIEW"),
+    FA_EDIT("FA_EDIT");
 
     private final String name;
 

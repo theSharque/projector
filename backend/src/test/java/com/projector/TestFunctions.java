@@ -192,7 +192,7 @@ public abstract class TestFunctions {
     }
 
     /**
-     * Создает тестовую feature.
+     * Создает тестовую feature (с пустым списком FA - нужно добавить вручную для валидации).
      */
     protected Feature createTestFeature(Long id, Long year, Quarter quarter, Long authorId, String summary, String description) {
         return Feature.builder()
@@ -204,6 +204,25 @@ public abstract class TestFunctions {
                 .release("v1.0.0")
                 .summary(summary)
                 .description(description)
+                .functionalAreaIds(List.of()) // Empty list - tests should set this
+                .createDate(LocalDateTime.now())
+                .build();
+    }
+
+    /**
+     * Создает тестовую feature с functional area IDs.
+     */
+    protected Feature createTestFeatureWithFa(Long id, Long year, Quarter quarter, Long authorId, String summary, String description, List<Long> faIds) {
+        return Feature.builder()
+                .id(id)
+                .year(year)
+                .quarter(quarter)
+                .authorId(authorId)
+                .sprint(1L)
+                .release("v1.0.0")
+                .summary(summary)
+                .description(description)
+                .functionalAreaIds(faIds)
                 .createDate(LocalDateTime.now())
                 .build();
     }

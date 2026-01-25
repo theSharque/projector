@@ -3,6 +3,7 @@ import type { Role } from './role.types';
 import type { Roadmap } from './roadmap.types';
 import type { Feature, Quarter } from './feature.types';
 import type { Task } from './task.types';
+import type { FunctionalArea, FunctionalAreaUsage } from './functionalArea.types';
 
 export interface ApiResponse<T> {
   data: T;
@@ -29,5 +30,7 @@ export type {
   Feature,
   Task,
   Quarter,
+  FunctionalArea,
+  FunctionalAreaUsage,
 };
 

@@ -5,6 +5,7 @@ import { featureApi } from '@/api';
 import type { Feature } from '@/types/api.types';
 import { QUARTERS } from '@/utils/constants';
 import UserSelector from '@/components/relations/UserSelector';
+import FunctionalAreaSelector from '@/components/relations/FunctionalAreaSelector';
 import Loading from '@/components/common/Loading';
 
 const { TextArea } = Input;
@@ -93,6 +94,24 @@ const FeatureFormPage = () => {
           rules={[{ required: true, message: 'Please select author!' }]}
         >
           <UserSelector />
+        </Form.Item>
+
+        <Form.Item
+          label="Functional Areas"
+          name="functionalAreaIds"
+          rules={[
+            { required: true, message: 'Please select at least one functional area!' },
+            {
+              validator: (_, value) => {
+                if (!value || value.length === 0) {
+                  return Promise.reject(new Error('At least one functional area is required'));
+                }
+                return Promise.resolve();
+              },
+            },
+          ]}
+        >
+          <FunctionalAreaSelector />
         </Form.Item>
 
         <Form.Item label="Sprint" name="sprint">

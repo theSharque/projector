@@ -12,6 +12,8 @@ import FeatureListPage from './features/feature/pages/FeatureListPage';
 import FeatureFormPage from './features/feature/pages/FeatureFormPage';
 import TaskListPage from './features/task/pages/TaskListPage';
 import TaskFormPage from './features/task/pages/TaskFormPage';
+import FunctionalAreaListPage from './features/functionalArea/pages/FunctionalAreaListPage';
+import FunctionalAreaFormPage from './features/functionalArea/pages/FunctionalAreaFormPage';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuthStore();
@@ -40,6 +42,9 @@ const Router = () => {
         <Route path="roadmaps" element={<RoadmapListPage />} />
         <Route path="roadmaps/new" element={<RoadmapFormPage />} />
         <Route path="roadmaps/:id/edit" element={<RoadmapFormPage />} />
+        <Route path="functional-areas" element={<FunctionalAreaListPage />} />
+        <Route path="functional-areas/new" element={<FunctionalAreaFormPage />} />
+        <Route path="functional-areas/:id/edit" element={<FunctionalAreaFormPage />} />
         <Route path="features" element={<FeatureListPage />} />
         <Route path="features/new" element={<FeatureFormPage />} />
         <Route path="features/:id/edit" element={<FeatureFormPage />} />
