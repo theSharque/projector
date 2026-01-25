@@ -227,6 +227,7 @@ public class FeatureController_e2e extends TestFunctions {
         // Given - feature without functional area IDs
         Feature newFeature = createTestFeature(null, 2024L, Quarter.Q1, 1L,
                 "Feature without FA", "Should fail validation");
+        newFeature.setFunctionalAreaIds(java.util.List.of()); // Explicitly set empty list
 
         // When & Then - should return 400 because functional area IDs are required
         webTestClientWithAuth(authToken)

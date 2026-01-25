@@ -109,6 +109,11 @@ VALUES (
 INSERT INTO user_roles (user_id, role_id)
 VALUES (1, 1) ON CONFLICT (user_id, role_id) DO NOTHING;
 
+-- Insert default functional area for testing
+INSERT INTO functional_areas (id, name, description, create_date, update_date)
+VALUES (1, 'General', 'General functional area for features without specific categorization', NOW(), NOW())
+ON CONFLICT (name) DO NOTHING;
+
 SELECT setval('users_id_seq', 10, true);
 SELECT setval('roles_id_seq', 10, true);
 SELECT setval('roadmaps_id_seq', 10, true);

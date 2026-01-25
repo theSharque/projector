@@ -192,7 +192,7 @@ public abstract class TestFunctions {
     }
 
     /**
-     * Создает тестовую feature (с пустым списком FA - нужно добавить вручную для валидации).
+     * Создает тестовую feature (с FA ID=1 по умолчанию из миграции).
      */
     protected Feature createTestFeature(Long id, Long year, Quarter quarter, Long authorId, String summary, String description) {
         return Feature.builder()
@@ -204,7 +204,7 @@ public abstract class TestFunctions {
                 .release("v1.0.0")
                 .summary(summary)
                 .description(description)
-                .functionalAreaIds(List.of()) // Empty list - tests should set this
+                .functionalAreaIds(List.of(1L)) // Default FA from migration
                 .createDate(LocalDateTime.now())
                 .build();
     }
