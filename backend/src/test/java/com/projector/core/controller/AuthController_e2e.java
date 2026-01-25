@@ -1,8 +1,10 @@
 package com.projector.core.controller;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 
@@ -15,6 +17,7 @@ import com.projector.core.model.UserCredentials;
  * Тестирует controller, service, repository без моков.
  */
 @DirtiesContext
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class AuthController_e2e extends TestFunctions {
 
     @BeforeEach

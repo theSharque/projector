@@ -230,10 +230,11 @@ public abstract class TestFunctions {
     /**
      * Создает тестовую task.
      */
-    protected Task createTestTask(Long id, Long featureId, Long authorId, String summary, String description) {
+    protected Task createTestTask(Long id, Long featureId, Long roadmapId, Long authorId, String summary, String description) {
         return Task.builder()
                 .id(id)
                 .featureId(featureId)
+                .roadmapId(roadmapId)
                 .authorId(authorId)
                 .summary(summary)
                 .description(description)

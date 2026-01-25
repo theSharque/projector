@@ -100,6 +100,18 @@ tasks.named('test') {
     useJUnitPlatform()
     environment 'DOCKER_HOST', 'unix:///var/run/docker.sock'
     environment 'TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE', '/var/run/docker.sock'
+    
+    // Run tests sequentially to avoid race conditions with shared database
+    maxParallelForks = 1
+    
+    // Run test classes in alphabetical order for consistency
+    systemProperty 'junit.jupiter.testclass.order.default', 'org.junit.jupiter.api.ClassOrderer$ClassName'
+    
+    // Increase test timeout
+    testLogging {
+        events "passed", "skipped", "failed"
+        exceptionFormat "full"
+    }
 }
 
 springBoot {
